@@ -1,3 +1,13 @@
 {
-  "outputDirectory": "dist"
+  "outputDirectory": "dist",
+  "rewrites": [
+    {
+      "source": "/clientReview/(.*)",
+      "destination": "/clientReview/index.html"
+    },
+    {
+      "source": "/reviewdash/(.*)",
+      "destination": "/reviewdash/index.html"
+    }
+  ]
 }
