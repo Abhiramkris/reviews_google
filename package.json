@@ -8,7 +8,7 @@
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev --prefix clientReview\" \"npm run dev --prefix reviewdash\"",
-    "build": "npm run build --prefix clientReview && npm run build --prefix reviewdash"
+    "build": "npm run build --prefix clientReview && npm run build --prefix reviewdash && rm -rf dist && mkdir -p dist && cp -r clientReview/dist dist/clientReview && cp -r reviewdash/dist dist/reviewdash"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"
