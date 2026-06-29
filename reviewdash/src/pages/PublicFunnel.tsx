@@ -1,9 +1,20 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
-const API_BASE_URL = import.meta.env.DEV 
-  ? 'http://localhost:8787/adminApiBlog' 
-  : 'https://bloggfeature.certifyied.workers.dev/adminApiBlog';
+const LOCAL_API_URL = 'http://localhost:8787/adminApiBlog';
+const LIVE_API_URL = 'https://bloggfeature.certifyied.workers.dev/adminApiBlog';
+
+async function apiFetch(path: string, options: RequestInit = {}) {
+  if (import.meta.env.DEV) {
+    try {
+      const res = await fetch(`${LOCAL_API_URL}${path}`, options);
+      return res;
+    } catch (err) {
+      console.warn('⚠️ Local worker connection failed, falling back to live worker.');
+    }
+  }
+  return await fetch(`${LIVE_API_URL}${path}`, options);
+}
 
 export default function PublicFunnel() {
   const [searchParams] = useSearchParams();
@@ -30,7 +41,7 @@ export default function PublicFunnel() {
       return;
     }
 
-    fetch(`${API_BASE_URL}/api/reviews/public/client?clientId=${clientId}`)
+    apiFetch(`/api/reviews/public/client?clientId=${clientId}`)
       .then(res => {
         if (!res.ok) throw new Error('Client profile not found.');
         return res.json();
@@ -52,7 +63,7 @@ export default function PublicFunnel() {
     if (selected >= 4) {
       setLoading(true);
       try {
-        const res = await fetch(`${API_BASE_URL}/api/reviews/public/submit`, {
+        const res = await apiFetch(`/api/reviews/public/submit`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -82,7 +93,7 @@ export default function PublicFunnel() {
   // Submit actual facilitated redirection action
   const handleGoogleClick = async () => {
     try {
-      await fetch(`${API_BASE_URL}/api/reviews/public/submit`, {
+      await apiFetch(`/api/reviews/public/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -108,7 +119,7 @@ export default function PublicFunnel() {
 
     setLoading(true);
     try {
-      const res = await fetch(`${API_BASE_URL}/api/reviews/public/submit`, {
+      const res = await apiFetch(`/api/reviews/public/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
