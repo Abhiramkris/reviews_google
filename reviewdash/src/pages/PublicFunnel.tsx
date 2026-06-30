@@ -2,6 +2,39 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 
 const LOCAL_API_URL = 'http://localhost:8787/adminApiBlog';
+
+const DEFAULT_TEMPLATES = [
+  "Excellent service and very friendly staff! Highly recommended.",
+  "Great experience overall. Extremely professional and helpful.",
+  "Super fast response times and high quality work. Very satisfied!",
+  "Great customer support and very professional service.",
+  "Outstanding quality and friendly support. Will definitely use again.",
+  "Very friendly staff, clean environment, and top-tier service.",
+  "Quick, professional, and very easy to work with. Highly recommended!",
+  "Top notch support and attention to detail. Extremely pleased.",
+  "Very reliable, fast, and high quality support. Great experience!",
+  "Excellent communication and professional results. Thank you!",
+  "Friendly service, reasonable pricing, and amazing quality.",
+  "Exceeded my expectations! Quick, friendly, and very professional.",
+  "A wonderful experience from start to finish. Highly recommend them.",
+  "Very polite team and superb results. Couldn't be happier!",
+  "Great quality, fast support, and very friendly people.",
+  "Extremely satisfied with the service. Prompt and professional.",
+  "They went above and beyond to help me. Excellent customer care!",
+  "Highly professional and efficient team. Great service overall.",
+  "Amazing experience! They were fast, helpful, and very friendly.",
+  "Consistent high quality work and friendly staff. Highly recommend.",
+  "Prompt response, helpful staff, and fantastic service.",
+  "Professional support and very neat execution. 5 stars!",
+  "So helpful, polite, and quick to resolve my request.",
+  "Very professional, reliable, and friendly service every time.",
+  "Fast service, friendly team, and excellent results.",
+  "Highly recommend this business! Excellent service and support.",
+  "Wonderful service, very friendly support, and great quality.",
+  "Very fast support, nice staff, and clean work. Thank you!",
+  "They made the whole process easy and stress-free. Great team!",
+  "Very impressed with the efficiency and friendly service."
+];
 const LIVE_API_URL = 'https://bloggfeature.certifyied.workers.dev/adminApiBlog';
 
 async function apiFetch(path: string, options: RequestInit = {}) {
@@ -59,7 +92,7 @@ export default function PublicFunnel() {
     setRating(selected);
     setErrorMsg('');
 
-    // If rating is 4 or 5, immediately pre-fetch AI suggestions
+    // If rating is 4 or 5, immediately fetch suggestions, copy a random template, and redirect
     if (selected >= 4) {
       setLoading(true);
       try {
@@ -76,11 +109,49 @@ export default function PublicFunnel() {
         });
 
         const data = await res.json();
+        let targetLink = clientInfo?.google_review_link || '';
+        let fetchedExamples: string[] = [];
+
         if (res.ok && data.action === 'review_facilitation') {
-          setAiSuggestions(data.examples || []);
-          setGoogleLink(data.google_review_link || '');
+          fetchedExamples = data.examples || [];
+          targetLink = data.google_review_link || targetLink;
+          setAiSuggestions(fetchedExamples);
+          setGoogleLink(targetLink);
         } else {
-          throw new Error(data.error || 'Failed to initialize Google redirection.');
+          // If server fails or columns missing, select a random subset of 3 from 30 templates
+          const shuffled = [...DEFAULT_TEMPLATES].sort(() => 0.5 - Math.random());
+          fetchedExamples = shuffled.slice(0, 3);
+          setAiSuggestions(fetchedExamples);
+        }
+
+        // Randomly pick one template from suggestions
+        const candidates = fetchedExamples.length > 0 ? fetchedExamples : DEFAULT_TEMPLATES;
+        const randomIndex = Math.floor(Math.random() * candidates.length);
+        const selectedTemplate = candidates[randomIndex];
+
+        // Auto copy to clipboard
+        try {
+          await navigator.clipboard.writeText(selectedTemplate);
+          setCopiedIndex(randomIndex);
+        } catch (copyErr) {
+          console.warn("Failed to auto-copy to clipboard:", copyErr);
+        }
+
+        // Auto redirect to Google Reviews in new tab
+        if (targetLink) {
+          apiFetch(`/api/reviews/public/submit`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              clientId,
+              rating: selected,
+              reviewer_name: 'Anonymous',
+              comment: 'Positive rating facilitation',
+              draft: false
+            })
+          }).catch(err => console.error("Failed to log redirection:", err));
+
+          window.open(targetLink, '_blank');
         }
       } catch (err: any) {
         setErrorMsg(err.message || 'Connection error.');
@@ -300,22 +371,31 @@ export default function PublicFunnel() {
         {/* Facilitated Flow: 4-5 Stars (AI Suggestions & Clipboard Copy) */}
         {!submitted && rating >= 4 && !loading && (
           <div>
-            <div className="google-label" style={{ textAlign: 'left', marginBottom: '1.25rem', color: '#137333' }}>
-              🎉 Great! Choose one of the suggestions below to copy and paste to help others find us on Google:
+            <div className="google-label" style={{ textAlign: 'left', marginBottom: '1.25rem', color: '#137333', lineHeight: '1.5' }}>
+              🎉 <strong>Review copied to clipboard!</strong> We have redirected you to Google Reviews. If the pop-up didn't open, please click "Continue to Google Review" below.
             </div>
 
-            {aiSuggestions.map((example, idx) => (
-              <div
-                key={idx}
-                className={`suggestion-card ${copiedIndex === idx ? 'copied' : ''}`}
-                onClick={() => copyToClipboard(example, idx)}
-              >
-                {copiedIndex === idx && <span className="suggestion-copy-badge">Copied!</span>}
-                <p style={{ fontSize: '0.85rem', color: '#3c4043', lineHeight: '1.5', paddingRight: '2rem' }}>
-                  "{example}"
-                </p>
-              </div>
-            ))}
+            <div style={{ marginBottom: '1.5rem' }}>
+              <span style={{ fontSize: '0.8rem', color: '#5f6368', display: 'block', marginBottom: '0.5rem' }}>
+                Copied template:
+              </span>
+              {aiSuggestions.map((example, idx) => (
+                <div
+                  key={idx}
+                  className={`suggestion-card ${copiedIndex === idx ? 'copied' : ''}`}
+                  onClick={() => copyToClipboard(example, idx)}
+                >
+                  {copiedIndex === idx ? (
+                    <span className="suggestion-copy-badge" style={{ backgroundColor: '#e6f4ea', color: '#137333' }}>✓ Copied (Auto)</span>
+                  ) : (
+                    <span className="suggestion-copy-badge">Click to Copy</span>
+                  )}
+                  <p style={{ fontSize: '0.85rem', color: '#3c4043', lineHeight: '1.5', paddingRight: '6rem' }}>
+                    "{example}"
+                  </p>
+                </div>
+              ))}
+            </div>
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1.5rem' }}>
               <a
