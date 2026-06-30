@@ -30,6 +30,7 @@ interface Client {
   ai_keywords: string;
   suggestion_type?: string;
   custom_suggestions?: string[];
+  copy_mode?: string;
   created_at: string;
 }
 
@@ -48,6 +49,7 @@ export default function AdminDashboard() {
   const [aiKeywords, setAiKeywords] = useState('');
   const [suggestionType, setSuggestionType] = useState('ai');
   const [customSuggestionsText, setCustomSuggestionsText] = useState('');
+  const [copyMode, setCopyMode] = useState('auto');
   const [projectId, setProjectId] = useState('');
   const [showForm, setShowForm] = useState(false);
 
@@ -134,7 +136,8 @@ export default function AdminDashboard() {
       suggestion_type: suggestionType,
       custom_suggestions: suggestionType === 'custom'
         ? customSuggestionsText.split('\n').map(s => s.trim()).filter(Boolean)
-        : []
+        : [],
+      copy_mode: copyMode
     };
 
     const method = editingClient ? 'PUT' : 'POST';
@@ -176,6 +179,7 @@ export default function AdminDashboard() {
     setAiKeywords(client.ai_keywords || '');
     setSuggestionType(client.suggestion_type || 'ai');
     setCustomSuggestionsText(Array.isArray(client.custom_suggestions) ? client.custom_suggestions.join('\n') : '');
+    setCopyMode(client.copy_mode || 'auto');
     setProjectId(client.project_id);
     setShowForm(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -213,6 +217,7 @@ export default function AdminDashboard() {
     setAiKeywords('');
     setSuggestionType('ai');
     setCustomSuggestionsText('');
+    setCopyMode('auto');
     setProjectId('');
     setShowForm(false);
   };
@@ -349,6 +354,19 @@ export default function AdminDashboard() {
                   >
                     <option value="ai">🤖 Dynamic AI (Gemini Generated)</option>
                     <option value="custom">✍️ Predefined Custom Templates</option>
+                  </select>
+                </div>
+
+                <div className="form-group">
+                  <label>Review Funnel Copy Mode</label>
+                  <select
+                    className="form-control"
+                    style={{ height: '47px' }}
+                    value={copyMode}
+                    onChange={e => setCopyMode(e.target.value)}
+                  >
+                    <option value="auto">⚡ Auto Copy & Redirect (Fastest conversion)</option>
+                    <option value="manual">📋 Manual Copy & Redirection (User picks suggestion)</option>
                   </select>
                 </div>
               </div>

@@ -23,6 +23,7 @@ interface ClientProfile {
   ai_keywords: string;
   suggestion_type?: string;
   custom_suggestions?: string[];
+  copy_mode?: string;
 }
 
 interface Review {
@@ -289,6 +290,22 @@ export default function ClientDashboard() {
                   </div>
                 </div>
               )}
+            </div>
+            <div>
+              <p style={{ fontSize: '0.85rem', color: '#94a3b8' }}>Review Funnel Copy Mode</p>
+              <div style={{ marginTop: '0.5rem' }}>
+                <span style={{ 
+                  backgroundColor: client.copy_mode === 'manual' ? '#eff6ff' : '#fef3c7', 
+                  border: client.copy_mode === 'manual' ? '1px solid #bfdbfe' : '1px solid #fde68a', 
+                  color: client.copy_mode === 'manual' ? '#1e40af' : '#92400e', 
+                  fontSize: '0.75rem', 
+                  padding: '0.2rem 0.5rem', 
+                  borderRadius: '6px', 
+                  fontWeight: 500 
+                }}>
+                  {client.copy_mode === 'manual' ? '📋 Manual Copy & Redirection' : '⚡ Auto Copy & Redirect'}
+                </span>
+              </div>
             </div>
           </div>
         </div>

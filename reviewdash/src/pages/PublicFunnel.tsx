@@ -53,7 +53,7 @@ export default function PublicFunnel() {
   const [searchParams] = useSearchParams();
   const clientId = searchParams.get('clientId');
   
-  const [clientInfo, setClientInfo] = useState<{ name: string; google_review_link: string } | null>(null);
+  const [clientInfo, setClientInfo] = useState<{ name: string; google_review_link: string; copy_mode?: string } | null>(null);
   const [rating, setRating] = useState<number>(0);
   const [hoverRating, setHoverRating] = useState<number>(0);
   const [reviewerName, setReviewerName] = useState('');
@@ -92,7 +92,7 @@ export default function PublicFunnel() {
     setRating(selected);
     setErrorMsg('');
 
-    // If rating is 4 or 5, immediately fetch suggestions, copy a random template, and redirect
+    // If rating is 4 or 5, fetch suggestions and respect client's copy_mode setting
     if (selected >= 4) {
       setLoading(true);
       try {
@@ -111,10 +111,12 @@ export default function PublicFunnel() {
         const data = await res.json();
         let targetLink = clientInfo?.google_review_link || '';
         let fetchedExamples: string[] = [];
+        let activeCopyMode = clientInfo?.copy_mode || 'auto';
 
         if (res.ok && data.action === 'review_facilitation') {
           fetchedExamples = data.examples || [];
           targetLink = data.google_review_link || targetLink;
+          activeCopyMode = data.copy_mode || activeCopyMode;
           setAiSuggestions(fetchedExamples);
           setGoogleLink(targetLink);
         } else {
@@ -124,34 +126,37 @@ export default function PublicFunnel() {
           setAiSuggestions(fetchedExamples);
         }
 
-        // Randomly pick one template from suggestions
-        const candidates = fetchedExamples.length > 0 ? fetchedExamples : DEFAULT_TEMPLATES;
-        const randomIndex = Math.floor(Math.random() * candidates.length);
-        const selectedTemplate = candidates[randomIndex];
+        // Auto copy & redirect only if copy_mode is 'auto'
+        if (activeCopyMode === 'auto') {
+          // Randomly pick one template from suggestions
+          const candidates = fetchedExamples.length > 0 ? fetchedExamples : DEFAULT_TEMPLATES;
+          const randomIndex = Math.floor(Math.random() * candidates.length);
+          const selectedTemplate = candidates[randomIndex];
 
-        // Auto copy to clipboard
-        try {
-          await navigator.clipboard.writeText(selectedTemplate);
-          setCopiedIndex(randomIndex);
-        } catch (copyErr) {
-          console.warn("Failed to auto-copy to clipboard:", copyErr);
-        }
+          // Auto copy to clipboard
+          try {
+            await navigator.clipboard.writeText(selectedTemplate);
+            setCopiedIndex(randomIndex);
+          } catch (copyErr) {
+            console.warn("Failed to auto-copy to clipboard:", copyErr);
+          }
 
-        // Auto redirect to Google Reviews in new tab
-        if (targetLink) {
-          apiFetch(`/api/reviews/public/submit`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              clientId,
-              rating: selected,
-              reviewer_name: 'Anonymous',
-              comment: 'Positive rating facilitation',
-              draft: false
-            })
-          }).catch(err => console.error("Failed to log redirection:", err));
+          // Auto redirect to Google Reviews in new tab
+          if (targetLink) {
+            apiFetch(`/api/reviews/public/submit`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                clientId,
+                rating: selected,
+                reviewer_name: 'Anonymous',
+                comment: 'Positive rating facilitation',
+                draft: false
+              })
+            }).catch(err => console.error("Failed to log redirection:", err));
 
-          window.open(targetLink, '_blank');
+            window.open(targetLink, '_blank');
+          }
         }
       } catch (err: any) {
         setErrorMsg(err.message || 'Connection error.');
@@ -371,13 +376,19 @@ export default function PublicFunnel() {
         {/* Facilitated Flow: 4-5 Stars (AI Suggestions & Clipboard Copy) */}
         {!submitted && rating >= 4 && !loading && (
           <div>
-            <div className="google-label" style={{ textAlign: 'left', marginBottom: '1.25rem', color: '#137333', lineHeight: '1.5' }}>
-              🎉 <strong>Review copied to clipboard!</strong> We have redirected you to Google Reviews. If the pop-up didn't open, please click "Continue to Google Review" below.
-            </div>
+            {clientInfo?.copy_mode === 'manual' ? (
+              <div className="google-label" style={{ textAlign: 'left', marginBottom: '1.25rem', color: '#137333', lineHeight: '1.5' }}>
+                🎉 Great! Click any suggestion below to copy it, then click "Continue to Google Review" to leave your feedback:
+              </div>
+            ) : (
+              <div className="google-label" style={{ textAlign: 'left', marginBottom: '1.25rem', color: '#137333', lineHeight: '1.5' }}>
+                🎉 <strong>Review template auto-copied!</strong> We have redirected you to Google Reviews. If the pop-up didn't open, please click "Continue to Google Review" below.
+              </div>
+            )}
 
             <div style={{ marginBottom: '1.5rem' }}>
               <span style={{ fontSize: '0.8rem', color: '#5f6368', display: 'block', marginBottom: '0.5rem' }}>
-                Copied template:
+                {clientInfo?.copy_mode === 'manual' ? 'Suggested Templates:' : 'Copied template:'}
               </span>
               {aiSuggestions.map((example, idx) => (
                 <div
@@ -386,7 +397,7 @@ export default function PublicFunnel() {
                   onClick={() => copyToClipboard(example, idx)}
                 >
                   {copiedIndex === idx ? (
-                    <span className="suggestion-copy-badge" style={{ backgroundColor: '#e6f4ea', color: '#137333' }}>✓ Copied (Auto)</span>
+                    <span className="suggestion-copy-badge" style={{ backgroundColor: '#e6f4ea', color: '#137333' }}>✓ Copied</span>
                   ) : (
                     <span className="suggestion-copy-badge">Click to Copy</span>
                   )}
@@ -412,15 +423,6 @@ export default function PublicFunnel() {
                   Continue to Google Review
                 </button>
               </a>
-
-              <button
-                type="button"
-                className="google-btn google-btn-text"
-                style={{ alignSelf: 'center' }}
-                onClick={() => setRating(0)}
-              >
-                Change Rating
-              </button>
             </div>
           </div>
         )}
