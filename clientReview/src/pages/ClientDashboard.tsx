@@ -110,8 +110,13 @@ export default function ClientDashboard() {
   };
 
   const copyFunnelLink = (clientId: string) => {
+    const params = new URLSearchParams(window.location.search);
+    const parentOrigin = params.get('parent_origin');
+    
     const customDomain = import.meta.env.VITE_FEEDBACK_DOMAIN;
-    const baseDomain = customDomain ? customDomain.replace(/\/$/, '') : window.location.origin;
+    const baseDomain = parentOrigin 
+      ? parentOrigin.replace(/\/$/, '') 
+      : (customDomain ? customDomain.replace(/\/$/, '') : window.location.origin);
     
     let linkPath = '/feedback';
     if (window.location.pathname.includes('/clientReview')) {
