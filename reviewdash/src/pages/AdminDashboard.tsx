@@ -243,7 +243,11 @@ export default function AdminDashboard() {
   const handleLogout = () => {
     localStorage.removeItem('review_auth_token');
     document.cookie = "review_auth_token=; path=/; max-age=0; SameSite=Lax";
-    navigate('/login');
+    if (window.location.hostname.endsWith('certifyied.com')) {
+      window.location.href = 'https://www.certifyied.com/certlogin';
+    } else {
+      navigate('/login');
+    }
   };
 
   if (loading) {
