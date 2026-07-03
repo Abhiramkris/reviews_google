@@ -166,53 +166,46 @@ export default function PublicFunnel() {
     }
   };
 
-  // Submit actual facilitated redirection action
-  const handleGoogleClick = async () => {
-    try {
-      await apiFetch(`/api/reviews/public/submit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          clientId,
-          rating,
-          reviewer_name: 'Anonymous',
-          comment: 'Positive rating facilitation',
-          draft: false
-        })
-      });
-    } catch (err) {
-      console.error("Failed to log Google redirection click:", err);
-    }
-  };
-
-  // Submit negative review internally (<=3 stars)
-  const handleDivertedSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!comment.trim()) {
-      setErrorMsg('Please tell us how we can improve.');
-      return;
-    }
-
+  const handlePostClick = async () => {
+    setErrorMsg('');
     setLoading(true);
+
     try {
+      const isPositive = rating >= 4;
       const res = await apiFetch(`/api/reviews/public/submit`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           clientId,
           rating,
-          reviewer_name: reviewerName || 'Anonymous',
-          reviewer_email: reviewerEmail || null,
-          comment
+          reviewer_name: reviewerName.trim() || 'Anonymous',
+          reviewer_email: reviewerEmail.trim() || null,
+          comment: comment.trim(),
+          draft: false
         })
       });
 
       const data = await res.json();
-      if (res.ok) {
-        setSubmitted(true);
-      } else {
-        throw new Error(data.error || 'Feedback submission failed.');
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to submit review.');
       }
+
+      if (isPositive) {
+        try {
+          if (comment.trim()) {
+            await navigator.clipboard.writeText(comment.trim());
+          }
+        } catch (copyErr) {
+          console.warn("Auto-copy failed:", copyErr);
+        }
+        
+        const targetLink = googleLink || clientInfo?.google_review_link;
+        if (targetLink) {
+          window.open(targetLink, '_blank');
+        }
+      }
+
+      setSubmitted(true);
     } catch (err: any) {
       setErrorMsg(err.message || 'Connection error.');
     } finally {
@@ -220,12 +213,7 @@ export default function PublicFunnel() {
     }
   };
 
-  const copyToClipboard = (text: string, index: number) => {
-    navigator.clipboard.writeText(text);
-    setCopiedIndex(index);
-    // Reset copy confirmation after 3s
-    setTimeout(() => setCopiedIndex(null), 3000);
-  };
+
 
   if (errorMsg && !clientInfo) {
     return (
@@ -240,53 +228,59 @@ export default function PublicFunnel() {
 
   if (!clientInfo) {
     return (
-      <div className="google-funnel-body">
-        <div className="google-card" style={{ textAlign: 'center', padding: '3.5rem 2rem' }}>
-          <p style={{ color: '#5f6368', fontWeight: 500, margin: 0 }}>Loading secure review portal...</p>
+      <div className="google-funnel-body" style={{ margin: 0, padding: 0, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#f1f3f4' }}>
+        <div className="google-card" style={{ maxWidth: '500px', width: '100%', margin: '0 auto', padding: '3.5rem 2rem', textAlign: 'center', backgroundColor: '#ffffff', borderRadius: '8px', boxShadow: '0 1px 3px rgba(0,0,0,0.1)' }}>
+          <p style={{ color: '#5f6368', fontWeight: 500, margin: 0, fontFamily: 'Roboto, Arial, sans-serif' }}>Loading secure review portal...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="google-funnel-body">
-      <div className="google-card">
+    <div className="google-funnel-body" style={{ margin: 0, padding: 0, minHeight: '100vh', display: 'flex', alignItems: 'flex-start', justifyContent: 'center', backgroundColor: '#f1f3f4', fontFamily: 'Roboto, Arial, sans-serif' }}>
+      <div className="google-card" style={{ width: '100%', maxWidth: '500px', minHeight: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: '#ffffff', borderRadius: 0, padding: 0, boxShadow: 'none', border: 'none' }}>
         
-        {/* Portal Header */}
-        <div className="google-header" style={{ padding: '1.25rem 1rem', display: 'flex', justifyContent: 'center', alignItems: 'center', borderBottom: '1px solid #e2e8f0', backgroundColor: '#f8fafc', borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}>
-          {clientInfo.logo_url ? (
-            <img src={clientInfo.logo_url} alt="Logo" style={{ height: '40px', objectFit: 'contain' }} />
-          ) : (
-            <span style={{ fontSize: '1.15rem', fontWeight: 700, color: '#0f172a', letterSpacing: '-0.02em' }}>
-              {clientInfo.name}
-            </span>
-          )}
+        {/* Header */}
+        <div style={{ display: 'flex', alignItems: 'center', padding: '12px 16px', borderBottom: '1px solid #dadce0', position: 'sticky', top: 0, backgroundColor: '#ffffff', zIndex: 10 }}>
+          <button 
+            onClick={() => window.history.back()} 
+            style={{ border: 'none', background: 'none', cursor: 'pointer', padding: '8px', marginRight: '12px', display: 'flex', alignItems: 'center', color: '#5f6368' }}
+          >
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="12" x2="6" y2="12"></line><polyline points="12 18 6 12 12 6"></polyline></svg>
+          </button>
+          <span style={{ fontSize: '18px', fontWeight: 500, color: '#202124', flex: 1, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>
+            {clientInfo.name}
+          </span>
         </div>
 
-        {/* Client Business Context */}
-        <div className="google-profile-section">
-          <div className="google-avatar">
-            {clientInfo.logo_url ? (
-              <img src={clientInfo.logo_url} alt="Logo" style={{ width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover' }} />
-            ) : (
-              clientInfo.name.charAt(0).toUpperCase()
-            )}
+        {/* Content Container */}
+        <div style={{ padding: '24px 16px', flex: 1, display: 'flex', flexDirection: 'column', gap: '16px' }}>
+          
+          {/* Profile Section */}
+          <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+            <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#f1f3f4', border: '1px solid #dadce0', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              {clientInfo.logo_url ? (
+                <img src={clientInfo.logo_url} alt="Logo" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              ) : (
+                <span style={{ fontSize: '16px', fontWeight: 700, color: '#1a73e8' }}>{clientInfo.name.charAt(0).toUpperCase()}</span>
+              )}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#202124' }}>Certifyied</span>
+              <span style={{ fontSize: '12px', color: '#5f6368', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
+                Posting publicly across Google 
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="#5f6368"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
+              </span>
+            </div>
           </div>
-          <div className="google-profile-info">
-            <span className="google-profile-name">{clientInfo.name}</span>
-            <span className="google-profile-postingtext">Posting publicly to help others</span>
-          </div>
-        </div>
 
-        {/* 5-Star Interactive Selector */}
-        {!submitted && rating === 0 && (
-          <div style={{ margin: '1rem 0' }}>
-            <div className="google-label">How would you rate your experience?</div>
-            <div className="google-stars-container">
+          {/* Interactive Stars */}
+          {!submitted && (
+            <div style={{ display: 'flex', justifyContent: 'center', gap: '8px', margin: '8px 0' }}>
               {[1, 2, 3, 4, 5].map((star) => (
                 <span
                   key={star}
-                  className={`google-star ${(hoverRating || rating) >= star ? 'active' : ''}`}
+                  style={{ fontSize: '42px', cursor: 'pointer', color: (hoverRating || rating) >= star ? '#fbbc05' : '#e8eaed', transition: 'color 0.15s' }}
                   onMouseEnter={() => setHoverRating(star)}
                   onMouseLeave={() => setHoverRating(0)}
                   onClick={() => handleRatingClick(star)}
@@ -295,145 +289,137 @@ export default function PublicFunnel() {
                 </span>
               ))}
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Loading Spinner */}
-        {loading && (
-          <div style={{ textAlign: 'center', padding: '2rem 0', color: '#1a73e8' }}>
-            <p>Processing rating...</p>
-          </div>
-        )}
-
-        {/* Diverted Flow: 1-3 Stars (Internal Feedback Form) */}
-        {!submitted && rating > 0 && rating <= 3 && !loading && (
-          <form onSubmit={handleDivertedSubmit}>
-            <div className="google-label" style={{ textAlign: 'left', marginBottom: '1rem' }}>
-              We are sorry to hear that. Please let us know how we can improve:
+          {/* Loading Indicator */}
+          {loading && (
+            <div style={{ textAlign: 'center', padding: '2rem 0', color: '#1a73e8' }}>
+              <p>Loading suggestions...</p>
             </div>
-            
-            <div className="google-textarea-wrapper">
-              <textarea
-                className="google-textarea"
-                placeholder="Describe your experience or issues..."
-                value={comment}
-                onChange={e => setComment(e.target.value)}
-                required
-              />
-            </div>
+          )}
 
-            <div className="form-group" style={{ marginBottom: '1rem' }}>
-              <input
-                type="text"
-                className="form-control"
-                placeholder="Your Name (Optional)"
-                style={{ backgroundColor: '#fff', color: '#000', border: '1px solid #dadce0' }}
-                value={reviewerName}
-                onChange={e => setReviewerName(e.target.value)}
-              />
-            </div>
-
-            <div className="form-group" style={{ marginBottom: '1.5rem' }}>
-              <input
-                type="email"
-                className="form-control"
-                placeholder="Your Email (Optional)"
-                style={{ backgroundColor: '#fff', color: '#000', border: '1px solid #dadce0' }}
-                value={reviewerEmail}
-                onChange={e => setReviewerEmail(e.target.value)}
-              />
-            </div>
-
-            {errorMsg && <p style={{ color: '#ea4335', fontSize: '0.85rem', marginBottom: '1rem' }}>{errorMsg}</p>}
-
-            <div className="google-btn-container">
-              <button
-                type="button"
-                className="google-btn google-btn-text"
-                onClick={() => setRating(0)}
-              >
-                Back
-              </button>
-              <button
-                type="submit"
-                className="google-btn google-btn-primary"
-              >
-                Submit Feedback
-              </button>
-            </div>
-          </form>
-        )}
-
-        {/* Thank You Card for Diverted Feedback */}
-        {submitted && (
-          <div style={{ textAlign: 'center', padding: '2rem 0' }}>
-            <div style={{ fontSize: '3rem', color: '#34a853', marginBottom: '1rem' }}>✓</div>
-            <h3>Thank you for your feedback!</h3>
-            <p style={{ color: '#5f6368', marginTop: '0.5rem', fontSize: '0.9rem' }}>
-              We appreciate your honesty and will use your input to improve our services immediately.
-            </p>
-          </div>
-        )}
-
-        {/* Facilitated Flow: 4-5 Stars (AI Suggestions & Clipboard Copy) */}
-        {!submitted && rating >= 4 && !loading && (
-          <div>
-            {clientInfo?.copy_mode === 'manual' ? (
-              <div className="google-label" style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', textAlign: 'left', marginBottom: '1.25rem', color: '#137333', lineHeight: '1.5' }}>
-                <svg style={{ width: '20px', height: '20px', fill: 'currentColor', flexShrink: 0 }} viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                <span>Great! Click any suggestion below to copy it, then click "Continue to Google Review" to leave your feedback:</span>
+          {/* Expanded Review Form */}
+          {!submitted && rating > 0 && !loading && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
+              
+              {/* Textarea container */}
+              <div style={{ border: '1px solid #dadce0', borderRadius: '8px', padding: '12px', minHeight: '120px', display: 'flex', flexDirection: 'column' }}>
+                <textarea
+                  style={{ border: 'none', outline: 'none', width: '100%', resize: 'none', fontSize: '15px', fontFamily: 'inherit', color: '#202124', flex: 1, minHeight: '100px' }}
+                  placeholder="Share details of your own experience at this place"
+                  value={comment}
+                  onChange={e => setComment(e.target.value)}
+                />
               </div>
-            ) : (
-              <div className="google-label" style={{ display: 'flex', alignItems: 'flex-start', gap: '8px', textAlign: 'left', marginBottom: '1.25rem', color: '#137333', lineHeight: '1.5' }}>
-                <svg style={{ width: '20px', height: '20px', fill: 'currentColor', flexShrink: 0 }} viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                <span><strong>Review template auto-copied!</strong> We have redirected you to Google Reviews. If the pop-up didn't open, please click "Continue to Google Review" below.</span>
-              </div>
-            )}
 
-            <div style={{ marginBottom: '1.5rem' }}>
-              <span style={{ fontSize: '0.8rem', color: '#5f6368', display: 'block', marginBottom: '0.5rem' }}>
-                {clientInfo?.copy_mode === 'manual' ? 'Suggested Templates:' : 'Copied template:'}
-              </span>
-              {aiSuggestions.map((example, idx) => (
-                <div
-                  key={idx}
-                  className={`suggestion-card ${copiedIndex === idx ? 'copied' : ''}`}
-                  onClick={() => copyToClipboard(example, idx)}
+              {/* Add Photos Button */}
+              <div style={{ display: 'flex', justifyContent: 'center' }}>
+                <button 
+                  type="button" 
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#e8f0fe', border: 'none', color: '#1a73e8', padding: '10px 24px', borderRadius: '100px', fontSize: '14px', fontWeight: 500, cursor: 'pointer' }}
                 >
-                  {copiedIndex === idx ? (
-                    <span className="suggestion-copy-badge" style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', backgroundColor: '#e6f4ea', color: '#137333' }}>
-                      <svg style={{ width: '12px', height: '12px', fill: 'currentColor' }} viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                      Copied
-                    </span>
-                  ) : (
-                    <span className="suggestion-copy-badge">Click to Copy</span>
-                  )}
-                  <p style={{ fontSize: '0.85rem', color: '#3c4043', lineHeight: '1.5', paddingRight: '6rem' }}>
-                    "{example}"
-                  </p>
-                </div>
-              ))}
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1.5rem' }}>
-              <a
-                href={googleLink || clientInfo.google_review_link}
-                target="_blank"
-                rel="noopener noreferrer"
-                style={{ textDecoration: 'none' }}
-                onClick={handleGoogleClick}
-              >
-                <button
-                  className="google-btn google-btn-primary"
-                  style={{ width: '100%', padding: '0.8rem', fontSize: '0.95rem' }}
-                >
-                  Continue to Google Review
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+                  Add photos
                 </button>
-              </a>
-            </div>
-          </div>
-        )}
+              </div>
 
+              {/* Suggestions Cards (For 4-5 Stars) */}
+              {rating >= 4 && aiSuggestions.length > 0 && (
+                <div style={{ marginTop: '8px' }}>
+                  <span style={{ fontSize: '13px', color: '#5f6368', display: 'block', marginBottom: '8px', fontWeight: 500 }}>
+                    💡 Choose another template if you like:
+                  </span>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                    {aiSuggestions.map((example, idx) => (
+                      <div
+                        key={idx}
+                        onClick={() => {
+                          setComment(example);
+                          navigator.clipboard.writeText(example);
+                          setCopiedIndex(idx);
+                          setTimeout(() => setCopiedIndex(null), 2000);
+                        }}
+                        style={{ border: '1px solid #dadce0', borderRadius: '8px', padding: '12px', cursor: 'pointer', backgroundColor: copiedIndex === idx ? '#f1f8e9' : '#ffffff', transition: 'background-color 0.2s', position: 'relative' }}
+                      >
+                        {copiedIndex === idx && (
+                          <span style={{ position: 'absolute', top: '8px', right: '8px', fontSize: '11px', backgroundColor: '#e6f4ea', color: '#137333', padding: '2px 6px', borderRadius: '4px', fontWeight: 500 }}>
+                            Copied!
+                          </span>
+                        )}
+                        <p style={{ fontSize: '13px', color: '#3c4043', margin: 0, paddingRight: '50px', lineHeight: '1.4' }}>
+                          "{example}"
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Contact Fields for Diverted Review (Optional) */}
+              {rating <= 3 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '8px' }}>
+                  <input
+                    type="text"
+                    placeholder="Your Name (Optional)"
+                    style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #dadce0', fontSize: '14px', fontFamily: 'inherit', outline: 'none' }}
+                    value={reviewerName}
+                    onChange={e => setReviewerName(e.target.value)}
+                  />
+                  <input
+                    type="email"
+                    placeholder="Your Email (Optional)"
+                    style={{ padding: '10px 12px', borderRadius: '8px', border: '1px solid #dadce0', fontSize: '14px', fontFamily: 'inherit', outline: 'none' }}
+                    value={reviewerEmail}
+                    onChange={e => setReviewerEmail(e.target.value)}
+                  />
+                </div>
+              )}
+
+              {errorMsg && <p style={{ color: '#ea4335', fontSize: '0.85rem', margin: 0 }}>{errorMsg}</p>}
+
+              {/* Post Button */}
+              <div style={{ marginTop: 'auto', paddingTop: '24px' }}>
+                <button
+                  onClick={handlePostClick}
+                  style={{ width: '100%', padding: '14px', backgroundColor: '#1a73e8', border: 'none', color: '#ffffff', borderRadius: '100px', fontSize: '16px', fontWeight: 500, cursor: 'pointer', outline: 'none' }}
+                >
+                  Post
+                </button>
+              </div>
+
+            </div>
+          )}
+
+          {/* Thank You Card */}
+          {submitted && (
+            <div style={{ textAlign: 'center', padding: '3rem 1rem' }}>
+              <div style={{ width: '64px', height: '64px', borderRadius: '50%', backgroundColor: '#e6f4ea', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', color: '#137333', fontSize: '32px' }}>
+                ✓
+              </div>
+              <h3 style={{ fontSize: '20px', fontWeight: 500, color: '#202124', marginBottom: '0.75rem' }}>
+                {rating >= 4 ? 'Review template copied!' : 'Thank you for your feedback!'}
+              </h3>
+              <p style={{ color: '#5f6368', fontSize: '14px', lineHeight: '1.6', margin: 0 }}>
+                {rating >= 4 
+                  ? 'We have copied your review text. Simply right-click (or long-press on mobile) and select Paste to write your review on Google.'
+                  : 'We appreciate your honesty and will use your input to improve our services immediately.'}
+              </p>
+              {rating >= 4 && (
+                <a
+                  href={googleLink || clientInfo.google_review_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ textDecoration: 'none', display: 'block', marginTop: '2rem' }}
+                >
+                  <button style={{ width: '100%', padding: '14px', backgroundColor: '#1a73e8', border: 'none', color: '#ffffff', borderRadius: '100px', fontSize: '16px', fontWeight: 500, cursor: 'pointer' }}>
+                    Continue to Google Review
+                  </button>
+                </a>
+              )}
+            </div>
+          )}
+
+        </div>
       </div>
     </div>
   );
