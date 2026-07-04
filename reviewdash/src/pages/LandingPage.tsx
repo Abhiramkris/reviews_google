@@ -428,14 +428,21 @@ export default function LandingPage() {
 
           {/* Right: industry list */}
           <div className="rm-biz-list">
-            {industries.map((name, i) => (
-              <div key={i} style={{ padding: '16px 0', borderBottom: i < industries.length - 1 ? '1px solid #e8eaed' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', transition: 'padding-left 0.2s' }}
-                onMouseEnter={e => e.currentTarget.style.paddingLeft = '8px'}
-                onMouseLeave={e => e.currentTarget.style.paddingLeft = '0'}>
-                <span style={{ fontSize: 'clamp(20px, 2.5vw, 28px)', fontWeight: 700, color: '#202124', letterSpacing: '-0.5px' }}>{name}</span>
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#bdc1c6" strokeWidth="2" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
-              </div>
-            ))}
+            {industries.map((name, i) => {
+              const id = name.toLowerCase().replace('.', '').trim().replace(/\s+/g, '-');
+              return (
+                <div 
+                  key={i} 
+                  onClick={() => navigate(import.meta.env.BASE_URL + 'industry/' + id)}
+                  style={{ padding: '16px 0', borderBottom: i < industries.length - 1 ? '1px solid #e8eaed' : 'none', display: 'flex', alignItems: 'center', justifyContent: 'space-between', transition: 'padding-left 0.2s', cursor: 'pointer' }}
+                  onMouseEnter={e => e.currentTarget.style.paddingLeft = '8px'}
+                  onMouseLeave={e => e.currentTarget.style.paddingLeft = '0'}
+                >
+                  <span style={{ fontSize: 'clamp(20px, 2.5vw, 28px)', fontWeight: 700, color: '#202124', letterSpacing: '-0.5px' }}>{name}</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={BLUE} strokeWidth="2" strokeLinecap="round"><line x1="5" y1="12" x2="19" y2="12" /><polyline points="12 5 19 12 12 19" /></svg>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>

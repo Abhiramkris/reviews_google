@@ -5,6 +5,7 @@ import ClientDashboard from './pages/ClientDashboard';
 import AdminDashboard from './pages/AdminDashboard';
 import LandingPage from './pages/LandingPage';
 import BlogPage from './pages/BlogPage';
+import IndustryPage from './pages/IndustryPage';
 
 const basename = window.location.pathname.startsWith('/reviewdash') ? '/reviewdash' : '';
 
@@ -17,6 +18,7 @@ function App() {
         <Route path="/login" element={<AuthPortal />} />
         <Route path="/feedback" element={<PublicFunnel />} />
         <Route path="/blog" element={<BlogPage />} />
+        <Route path="/industry/:industryId" element={<IndustryPage />} />
         <Route path="/dashboard" element={<ClientDashboard />} />
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="*" element={<Navigate to="/" replace />} />

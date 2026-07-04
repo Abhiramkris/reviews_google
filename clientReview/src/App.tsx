@@ -5,6 +5,7 @@ import AuthPortal from './pages/AuthPortal';
 import ClientDashboard from './pages/ClientDashboard';
 import SmartRoot from './SmartRoot';
 import BlogPage from './pages/BlogPage';
+import IndustryPage from './pages/IndustryPage';
 
 const basename = window.location.pathname.startsWith('/clientReview') ? '/clientReview' : '';
 
@@ -28,6 +29,7 @@ function App() {
         {/* Public Google-style review funnel */}
         <Route path="/feedback" element={<PublicFunnel />} />
         <Route path="/blog" element={<BlogPage />} />
+        <Route path="/industry/:industryId" element={<IndustryPage />} />
 
         {/* Fallback to landing */}
         <Route path="*" element={<LandingPage />} />
