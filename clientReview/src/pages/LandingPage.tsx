@@ -66,28 +66,108 @@ export default function LandingPage() {
       </nav>
 
       {/* ── HERO ── */}
-      <section style={{ paddingTop: 120, paddingBottom: 100, paddingLeft: 32, paddingRight: 32, textAlign: 'center' }}>
-        <div style={{ maxWidth: 680, margin: '0 auto' }}>
-          <h1 style={{ fontSize: 'clamp(42px, 6vw, 72px)', fontWeight: 700, lineHeight: 1.1, letterSpacing: '-2px', color: '#202124', margin: '0 0 24px' }}>
-            Your reputation.<br />
-            <span style={{ color: '#467222' }}>Managed.</span>
-          </h1>
-          <p style={{ fontSize: 'clamp(17px, 2.2vw, 20px)', color: '#5f6368', lineHeight: 1.65, maxWidth: 520, margin: '0 auto 44px', fontWeight: 400 }}>
-            Collect customer feedback, understand every experience and build a stronger online reputation.
-          </p>
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, flexWrap: 'wrap' }}>
-            <button onClick={goToLogin}
-              style={{ fontSize: 16, fontWeight: 500, color: '#fff', background: '#467222', border: 'none', cursor: 'pointer', padding: '13px 30px', borderRadius: 100, boxShadow: '0 1px 4px rgba(70,114,34,0.3)', transition: 'all 0.18s' }}
-              onMouseEnter={e => { e.currentTarget.style.background = '#3a5f1d'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
-              onMouseLeave={e => { e.currentTarget.style.background = '#467222'; e.currentTarget.style.transform = 'translateY(0)'; }}>
-              Get started
-            </button>
-            <a href="mailto:contact@certifyied.com?subject=Demo%20Request"
-              style={{ fontSize: 16, fontWeight: 500, color: '#467222', background: '#fff', border: '1px solid #dadce0', cursor: 'pointer', padding: '12px 28px', borderRadius: 100, textDecoration: 'none', transition: 'all 0.18s', display: 'inline-block' }}
-              onMouseEnter={e => { e.currentTarget.style.borderColor = '#467222'; e.currentTarget.style.background = '#f0f4ef'; }}
-              onMouseLeave={e => { e.currentTarget.style.borderColor = '#dadce0'; e.currentTarget.style.background = '#fff'; }}>
-              Book a Demo
-            </a>
+      <section style={{ paddingTop: 100, paddingBottom: 80, paddingLeft: 32, paddingRight: 32, overflow: 'hidden' }}>
+        <div style={{ maxWidth: 1080, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 64, alignItems: 'center' }} className="rm-hero-grid">
+
+          {/* Left: text */}
+          <div>
+            <h1 style={{ fontSize: 'clamp(38px, 5vw, 64px)', fontWeight: 700, lineHeight: 1.1, letterSpacing: '-2px', color: '#202124', margin: '0 0 24px' }}>
+              Your reputation.<br />
+              <span style={{ color: '#467222' }}>Managed.</span>
+            </h1>
+            <p style={{ fontSize: 'clamp(16px, 1.8vw, 19px)', color: '#5f6368', lineHeight: 1.7, maxWidth: 460, margin: '0 0 40px', fontWeight: 400 }}>
+              Collect customer feedback, understand every experience and build a stronger online reputation.
+            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+              <button onClick={goToLogin}
+                style={{ fontSize: 15, fontWeight: 500, color: '#fff', background: '#467222', border: 'none', cursor: 'pointer', padding: '13px 28px', borderRadius: 100, boxShadow: '0 1px 4px rgba(70,114,34,0.3)', transition: 'all 0.18s' }}
+                onMouseEnter={e => { e.currentTarget.style.background = '#3a5f1d'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+                onMouseLeave={e => { e.currentTarget.style.background = '#467222'; e.currentTarget.style.transform = 'translateY(0)'; }}>
+                Get started
+              </button>
+              <a href="mailto:contact@certifyied.com?subject=Demo%20Request"
+                style={{ fontSize: 15, fontWeight: 500, color: '#467222', background: '#fff', border: '1px solid #dadce0', padding: '12px 24px', borderRadius: 100, textDecoration: 'none', transition: 'all 0.18s', display: 'inline-block' }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = '#467222'; e.currentTarget.style.background = '#f0f4ef'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = '#dadce0'; e.currentTarget.style.background = '#fff'; }}>
+                Book a Demo
+              </a>
+            </div>
+          </div>
+
+          {/* Right: dashboard illustration */}
+          <div style={{ position: 'relative' }}>
+            <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8eaed', boxShadow: '0 8px 40px rgba(0,0,0,0.1)', overflow: 'hidden' }}>
+              {/* Browser chrome */}
+              <div style={{ background: '#f8f9fa', borderBottom: '1px solid #e8eaed', padding: '12px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ display: 'flex', gap: 5 }}>
+                  <div style={{ width: 10, height: 10, borderRadius: 5, background: '#ff5f57' }} />
+                  <div style={{ width: 10, height: 10, borderRadius: 5, background: '#ffbd2e' }} />
+                  <div style={{ width: 10, height: 10, borderRadius: 5, background: '#28c840' }} />
+                </div>
+                <div style={{ flex: 1, background: '#fff', borderRadius: 6, padding: '4px 12px', fontSize: 11, color: '#9aa0a6', border: '1px solid #e8eaed', maxWidth: 220, margin: '0 auto', textAlign: 'center' }}>
+                  Review Manager · Dashboard
+                </div>
+              </div>
+              {/* Header */}
+              <div style={{ padding: '20px 20px 12px', borderBottom: '1px solid #f1f3f4', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#202124' }}>Good morning, Abhiram</p>
+                  <p style={{ margin: '2px 0 0', fontSize: 11, color: '#9aa0a6' }}>Here's what's happening today</p>
+                </div>
+                <div style={{ width: 32, height: 32, borderRadius: 16, background: '#467222', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: '#fff' }}>A</div>
+              </div>
+              {/* Stats */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 1, background: '#f1f3f4' }}>
+                {[
+                  { label: 'Overall Rating', value: '4.8', unit: '★', color: '#fbbc05' },
+                  { label: 'Total Reviews', value: '1,284', unit: '', color: '#467222' },
+                  { label: 'To Google', value: '81%', unit: '', color: '#34a853' },
+                  { label: 'Private', value: '243', unit: '', color: '#ea4335' },
+                ].map((s, i) => (
+                  <div key={i} style={{ background: '#fff', padding: '16px 18px' }}>
+                    <p style={{ margin: '0 0 4px', fontSize: 11, color: '#9aa0a6', fontWeight: 500 }}>{s.label}</p>
+                    <p style={{ margin: 0, fontSize: 22, fontWeight: 700, color: s.color, letterSpacing: '-0.5px' }}>{s.value}<span style={{ fontSize: 14, marginLeft: 2 }}>{s.unit}</span></p>
+                  </div>
+                ))}
+              </div>
+              {/* Feedback list */}
+              <div style={{ padding: '14px 20px' }}>
+                <p style={{ margin: '0 0 12px', fontSize: 11, fontWeight: 600, color: '#9aa0a6', textTransform: 'uppercase', letterSpacing: 1 }}>Recent Feedback</p>
+                {[
+                  { init: 'PK', text: 'Loved the service! Will come back.', stars: 5, tag: 'Google', tagColor: '#1a73e8' },
+                  { init: 'AM', text: 'Waiting time was a bit long overall.', stars: 3, tag: 'Private', tagColor: '#ea4335' },
+                  { init: 'RS', text: 'Very professional team, great work!', stars: 5, tag: 'Google', tagColor: '#1a73e8' },
+                ].map((f, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 10, padding: '10px 0', borderBottom: i < 2 ? '1px solid #f1f3f4' : 'none', alignItems: 'flex-start' }}>
+                    <div style={{ width: 28, height: 28, borderRadius: 14, background: '#e8f5e0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 700, color: '#467222', flexShrink: 0 }}>{f.init}</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 3 }}>
+                        <span style={{ fontSize: 11, color: '#fbbc05' }}>{'★'.repeat(f.stars)}</span>
+                        <span style={{ fontSize: 10, fontWeight: 600, color: f.tagColor, background: f.tagColor + '15', padding: '2px 8px', borderRadius: 100 }}>{f.tag}</span>
+                      </div>
+                      <p style={{ margin: 0, fontSize: 12, color: '#5f6368', lineHeight: 1.4, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{f.text}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Floating rating badge */}
+            <div style={{ position: 'absolute', bottom: -16, left: -20, background: '#fff', borderRadius: 12, padding: '12px 16px', border: '1px solid #e8eaed', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ width: 36, height: 36, borderRadius: 18, background: '#e8f5e0', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="#467222"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+              </div>
+              <div>
+                <p style={{ margin: 0, fontSize: 13, fontWeight: 700, color: '#202124' }}>4.8 avg rating</p>
+                <p style={{ margin: 0, fontSize: 11, color: '#9aa0a6' }}>+0.4 this month</p>
+              </div>
+            </div>
+
+            {/* Floating new review badge */}
+            <div style={{ position: 'absolute', top: -16, right: -16, background: '#fff', borderRadius: 12, padding: '10px 14px', border: '1px solid #e8eaed', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div style={{ width: 8, height: 8, borderRadius: 4, background: '#34a853', animation: 'rm-pulse 2s infinite' }} />
+              <p style={{ margin: 0, fontSize: 12, fontWeight: 600, color: '#202124' }}>New review on Google</p>
+            </div>
           </div>
         </div>
       </section>
@@ -111,9 +191,15 @@ export default function LandingPage() {
             <p style={{ fontSize: 17, color: '#5f6368', lineHeight: 1.75, margin: '0 0 24px' }}>
               Review Manager helps customers express their genuine experience clearly and naturally.
             </p>
-            <p style={{ fontSize: 15, fontWeight: 600, color: '#202124', margin: 0 }}>
+            <p style={{ fontSize: 15, fontWeight: 600, color: '#202124', margin: '0 0 28px' }}>
               Simple. Helpful. Human.
             </p>
+            <button onClick={goToLogin}
+              style={{ fontSize: 15, fontWeight: 500, color: '#fff', background: '#467222', border: 'none', cursor: 'pointer', padding: '13px 28px', borderRadius: 100, boxShadow: '0 1px 4px rgba(70,114,34,0.3)', transition: 'all 0.18s' }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#3a5f1d'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#467222'; e.currentTarget.style.transform = 'translateY(0)'; }}>
+              Get started
+            </button>
           </div>
 
           <div style={{ background: '#f8faf5', borderRadius: 20, padding: '40px 36px', border: '1px solid #e0ecd6' }}>
@@ -175,11 +261,18 @@ export default function LandingPage() {
             <p style={{ fontSize: 17, color: '#5f6368', lineHeight: 1.75, margin: '0 0 28px' }}>
               Private feedback is organised in one simple dashboard, so your team can listen, act and improve.
             </p>
-            <a href="#everything" style={{ fontSize: 15, fontWeight: 500, color: '#467222', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, transition: 'gap 0.15s' }}
+            <a href="#everything" style={{ fontSize: 15, fontWeight: 500, color: '#467222', textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, transition: 'gap 0.15s', marginBottom: 28 }}
               onMouseEnter={e => (e.currentTarget.style.gap = '10px')}
               onMouseLeave={e => (e.currentTarget.style.gap = '6px')}>
               See what customers are saying →
             </a>
+            <br />
+            <button onClick={goToLogin}
+              style={{ fontSize: 15, fontWeight: 500, color: '#fff', background: '#467222', border: 'none', cursor: 'pointer', padding: '13px 28px', borderRadius: 100, boxShadow: '0 1px 4px rgba(70,114,34,0.3)', transition: 'all 0.18s', marginTop: 8 }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#3a5f1d'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#467222'; e.currentTarget.style.transform = 'translateY(0)'; }}>
+              Get started
+            </button>
           </div>
         </div>
       </section>
@@ -194,9 +287,15 @@ export default function LandingPage() {
             <h2 style={{ fontSize: 'clamp(28px, 3.5vw, 42px)', fontWeight: 700, letterSpacing: '-1px', color: '#202124', margin: '0 0 16px', lineHeight: 1.2 }}>
               Everything in one place.
             </h2>
-            <p style={{ fontSize: 18, fontWeight: 500, color: '#3c4043', margin: 0, lineHeight: 1.5 }}>
+            <p style={{ fontSize: 18, fontWeight: 500, color: '#3c4043', margin: '0 0 32px', lineHeight: 1.5 }}>
               One dashboard. Every customer experience.
             </p>
+            <button onClick={goToLogin}
+              style={{ fontSize: 15, fontWeight: 500, color: '#fff', background: '#467222', border: 'none', cursor: 'pointer', padding: '13px 28px', borderRadius: 100, boxShadow: '0 1px 4px rgba(70,114,34,0.3)', transition: 'all 0.18s' }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#3a5f1d'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#467222'; e.currentTarget.style.transform = 'translateY(0)'; }}>
+              Get started
+            </button>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 2 }}>
@@ -228,9 +327,15 @@ export default function LandingPage() {
             <h2 style={{ fontSize: 'clamp(28px, 3.5vw, 42px)', fontWeight: 700, letterSpacing: '-1px', color: '#202124', margin: '0 0 32px', lineHeight: 1.2 }}>
               Built for every business.
             </h2>
-            <p style={{ fontSize: 17, color: '#5f6368', lineHeight: 1.75, margin: 0 }}>
+            <p style={{ fontSize: 17, color: '#5f6368', lineHeight: 1.75, margin: '0 0 32px' }}>
               If customers have an experience, Review Manager can help you understand it.
             </p>
+            <button onClick={goToLogin}
+              style={{ fontSize: 15, fontWeight: 500, color: '#fff', background: '#467222', border: 'none', cursor: 'pointer', padding: '13px 28px', borderRadius: 100, boxShadow: '0 1px 4px rgba(70,114,34,0.3)', transition: 'all 0.18s' }}
+              onMouseEnter={e => { e.currentTarget.style.background = '#3a5f1d'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+              onMouseLeave={e => { e.currentTarget.style.background = '#467222'; e.currentTarget.style.transform = 'translateY(0)'; }}>
+              Get started
+            </button>
           </div>
 
           <div>
@@ -289,10 +394,15 @@ export default function LandingPage() {
       <style>{`
         @media (max-width: 768px) {
           .rm-hamburger { display: flex !important; }
+          .rm-hero-grid { grid-template-columns: 1fr !important; gap: 48px !important; }
           section > div[style*="grid-template-columns: 1fr 1fr"] {
             grid-template-columns: 1fr !important;
             gap: 48px !important;
           }
+        }
+        @keyframes rm-pulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(1.3); }
         }
       `}</style>
     </div>
