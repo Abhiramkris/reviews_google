@@ -3,6 +3,7 @@ import PublicFunnel from './pages/PublicFunnel';
 import AuthPortal from './pages/AuthPortal';
 import ClientDashboard from './pages/ClientDashboard';
 import AdminDashboard from './pages/AdminDashboard';
+import LandingPage from './pages/LandingPage';
 
 const basename = window.location.pathname.startsWith('/reviewdash') ? '/reviewdash' : '';
 
@@ -10,13 +11,13 @@ function App() {
   return (
     <Router basename={basename}>
       <Routes>
-        <Route path="/" element={<AuthPortal />} />
-        <Route path="/index.html" element={<AuthPortal />} />
-        <Route path="/feedback" element={<PublicFunnel />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/index.html" element={<LandingPage />} />
         <Route path="/login" element={<AuthPortal />} />
+        <Route path="/feedback" element={<PublicFunnel />} />
         <Route path="/dashboard" element={<ClientDashboard />} />
         <Route path="/admin" element={<AdminDashboard />} />
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );
