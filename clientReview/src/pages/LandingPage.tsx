@@ -402,14 +402,8 @@ export default function LandingPage() {
 
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&display=swap');
-        @media (max-width: 768px) {
-          .rm-hamburger { display: flex !important; }
-          .rm-hero-grid { grid-template-columns: 1fr !important; gap: 48px !important; }
-          section > div[style*="grid-template-columns: 1fr 1fr"] {
-            grid-template-columns: 1fr !important;
-            gap: 40px !important;
-          }
-        }
+
+        /* ── Animations ── */
         @keyframes rm-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
         @keyframes rm-fade-up { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
         @keyframes rm-fade-right { from{opacity:0;transform:translateX(32px)} to{opacity:1;transform:translateX(0)} }
@@ -417,6 +411,119 @@ export default function LandingPage() {
         .rm-fade-up { animation: rm-fade-up 0.7s cubic-bezier(.22,.68,0,1.2) both; }
         .rm-fade-in-right { animation: rm-fade-right 0.8s 0.2s cubic-bezier(.22,.68,0,1.2) both; }
         .rm-float { animation: rm-float 3.5s ease-in-out infinite; }
+
+        /* ── Mobile ── */
+        @media (max-width: 768px) {
+          .rm-hamburger { display: flex !important; }
+
+          /* Hero: stack vertically, center everything */
+          .rm-hero-grid {
+            grid-template-columns: 1fr !important;
+            gap: 0 !important;
+            text-align: center;
+          }
+          .rm-hero-grid > div:first-child {
+            order: 1;
+            padding-bottom: 40px;
+          }
+          .rm-hero-grid > div:first-child p {
+            margin-left: auto;
+            margin-right: auto;
+          }
+          .rm-hero-grid > div:first-child > div {
+            justify-content: center !important;
+          }
+          .rm-hero-grid > div:last-child {
+            order: 2;
+            margin: 0 -8px;
+          }
+          /* Hide floating badges on mobile — they overflow */
+          .rm-hero-grid > div:last-child > div[style*="position: absolute"] {
+            display: none !important;
+          }
+          /* Illustration full width, no clipping */
+          .rm-hero-grid > div:last-child > div:first-child {
+            border-radius: 12px !important;
+          }
+
+          /* All sections: single column, center text */
+          section > div[style*="grid-template-columns: 1fr 1fr"],
+          section > div[style*="gridTemplateColumns: '1fr 1fr'"] {
+            grid-template-columns: 1fr !important;
+            gap: 40px !important;
+            text-align: center;
+          }
+
+          /* Section 3 specific: feature tiles 2-col on mobile stays 2-col but smaller */
+          #everything .rm-feat-grid {
+            grid-template-columns: 1fr 1fr !important;
+          }
+
+          /* Center all section label text */
+          section p, section h2, section h3 {
+            text-align: center;
+          }
+          /* But keep feedback list items left-aligned */
+          section .rm-feedback-item {
+            text-align: left !important;
+          }
+          section .rm-feedback-item * {
+            text-align: left !important;
+          }
+
+          /* Sections: reduce padding */
+          section { padding-left: 20px !important; padding-right: 20px !important; }
+          section[style*="padding: '96px"] { padding-top: 64px !important; padding-bottom: 64px !important; }
+
+          /* Industry list: center */
+          #everything ~ section .rm-industry-row {
+            justify-content: center !important;
+          }
+
+          /* Nav buttons: hide sign in text on tiny screens, keep get started */
+          .rm-nav-signin { display: none !important; }
+
+          /* Feature card icons: center */
+          section div[style*="borderRadius: 10"] > div:first-child,
+          section div[style*="borderRadius: '10px'"] > div:first-child {
+            margin-left: auto;
+            margin-right: auto;
+          }
+
+          /* Funnel illustration: full width */
+          #everything > div > div:last-child {
+            margin: 0;
+          }
+
+          /* CTA section buttons: center */
+          section[style*="textAlign: 'center'"] button,
+          section[style*="text-align: center"] button {
+            display: block;
+            width: 100%;
+            max-width: 320px;
+            margin: 0 auto;
+          }
+
+          /* AI draft card: full width */
+          div[style*="borderRadius: 20"] {
+            margin: 40px 0 0 !important;
+          }
+        }
+
+        @media (max-width: 480px) {
+          .rm-hero-grid > div:first-child h1 {
+            font-size: 36px !important;
+          }
+          .rm-hero-grid > div:first-child > div {
+            flex-direction: column !important;
+            align-items: center !important;
+          }
+          .rm-hero-grid > div:first-child > div > * {
+            width: 100%;
+            max-width: 280px;
+            text-align: center;
+          }
+        }
       `}</style>
     </div>
   );
