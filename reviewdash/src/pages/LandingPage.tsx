@@ -46,6 +46,15 @@ export default function LandingPage() {
   const goToLogin = () => navigate('/login');
 
   const [modalOpen, setModalOpen] = useState(false);
+  const [activeStep, setActiveStep] = useState(0);
+
+  // Auto rotate steps every 4.5 seconds
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setActiveStep(prev => (prev + 1) % 4);
+    }, 4500);
+    return () => clearInterval(timer);
+  }, []);
   const [modalType, setModalType] = useState<'demo' | 'started'>('demo');
   const [modalName, setModalName] = useState('');
   const [modalEmail, setModalEmail] = useState('');
@@ -85,28 +94,7 @@ export default function LandingPage() {
 
   const industries = ['Restaurants.', 'Clinics.', 'Hotels.', 'Salons.', 'Retail.', 'Automotive.', 'Local businesses.'];
 
-  const steps = [
-    {
-      n: '01', title: 'Customer shares their experience',
-      desc: 'They rate their visit through a simple, branded link or QR code — no app needed.',
-      icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={BLUE} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" /></svg>,
-    },
-    {
-      n: '02', title: 'Review Manager routes it intelligently',
-      desc: 'High ratings are guided to Google. Lower ratings are captured privately for your team.',
-      icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={BLUE} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10" /><path d="M12 8v4l3 3" /></svg>,
-    },
-    {
-      n: '03', title: 'Bad reviews never go public',
-      desc: 'Unhappy customers share privately. You get the feedback. Google never sees a bad review.',
-      icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={BLUE} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /></svg>,
-    },
-    {
-      n: '04', title: 'Track everything in one dashboard',
-      desc: 'Ratings, reviews, feedback and insights — organised so your team can act fast.',
-      icon: <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={BLUE} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10" /><line x1="12" y1="20" x2="12" y2="4" /><line x1="6" y1="20" x2="6" y2="14" /></svg>,
-    },
-  ];
+
 
   return (
     <div style={{ fontFamily: "'Google Sans', Roboto, 'Helvetica Neue', Arial, sans-serif", background: '#fff', color: '#202124', overflowX: 'hidden' }}>
@@ -212,44 +200,205 @@ export default function LandingPage() {
 
       <div style={{ height: 1, background: '#e8eaed', maxWidth: 1080, margin: '0 auto' }} />
 
-      {/* ── HOW IT WORKS (Everything in one place) — stepped flow ── */}
-      <section id="how-it-works" style={{ padding: '88px 32px', background: '#f8faff' }}>
+      
+      {/* ── HOW IT WORKS (Everything in one place) — Interactive Step Flow ── */}
+      <section id="how-it-works" style={{ padding: '96px 32px', background: '#f8faff' }}>
         <div style={{ maxWidth: 1080, margin: '0 auto' }}>
+          
           {/* Header */}
           <div style={{ textAlign: 'center', marginBottom: 64 }}>
-            <p style={{ fontSize: 13, fontWeight: 600, color: BLUE, textTransform: 'uppercase', letterSpacing: 2, margin: '0 0 14px' }}>How it works</p>
+            <p style={{ fontSize: 13, fontWeight: 600, color: BLUE, textTransform: 'uppercase', letterSpacing: 2, margin: '0 0 14px' }}>Platform Flow</p>
             <h2 style={{ fontSize: 'clamp(26px, 3.5vw, 40px)', fontWeight: 700, letterSpacing: '-1px', color: '#202124', margin: '0 0 16px', lineHeight: 1.2 }}>Everything in one place.</h2>
-            <p style={{ fontSize: 17, color: '#5f6368', lineHeight: 1.7, maxWidth: 480, margin: '0 auto 36px' }}>One platform. Every customer experience. From the moment they rate to the moment you act.</p>
+            <p style={{ fontSize: 17, color: '#5f6368', lineHeight: 1.7, maxWidth: 520, margin: '0 auto 36px' }}>
+              One integrated platform. Multiple smart touchpoints. Experience a unified reputation management flow.
+            </p>
             <Btn onClick={() => openModal('started')}>Get started</Btn>
           </div>
 
-          {/* Steps grid */}
-          <div className="rm-steps-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 0, position: 'relative' }}>
-            {/* Connector line — desktop only */}
-            <div className="rm-steps-line" style={{ position: 'absolute', top: 28, left: '12.5%', right: '12.5%', height: 2, background: `linear-gradient(90deg, ${BLUE}, #34a853)`, zIndex: 0 }} />
-
-            {steps.map((step, i) => (
-              <div key={i} className="rm-step-card" style={{ padding: '0 16px 0', textAlign: 'center', position: 'relative', zIndex: 1 }}>
-                {/* Number circle */}
-                <div style={{ width: 56, height: 56, borderRadius: 28, background: i === steps.length - 1 ? '#34a853' : BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px', boxShadow: `0 4px 16px ${i === steps.length - 1 ? 'rgba(52,168,83,0.3)' : 'rgba(26,115,232,0.3)'}`, border: '4px solid #f8faff' }}>
-                  {step.icon}
-                </div>
-                {/* Connector dot for mobile */}
-                {i < steps.length - 1 && (
-                  <div className="rm-step-arrow" style={{ display: 'none', justifyContent: 'center', margin: '8px 0' }}>
-                    <svg width="12" height="20" viewBox="0 0 12 20" fill="none" stroke="#bdc1c6" strokeWidth="1.5" strokeLinecap="round"><line x1="6" y1="0" x2="6" y2="16" /><polyline points="1 11 6 16 11 11" /></svg>
+          {/* Interactive Steps Layout */}
+          <div className="rm-interactive-flow" style={{ display: 'grid', gridTemplateColumns: '1.2fr 1fr', gap: 64, alignItems: 'center' }}>
+            
+            {/* Left: Step Cards Selector */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+              {[
+                {
+                  n: '01',
+                  label: 'Capture Feedback',
+                  desc: 'Customers rate their experience via a simple, branded link or QR code — no downloads required.',
+                  icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={activeStep === 0 ? BLUE : '#9aa0a6'} strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                },
+                {
+                  n: '02',
+                  label: 'Intelligent Routing',
+                  desc: '4 & 5-star ratings are routed to Google Reviews. 1 to 3-star ratings are directed to a private feedback form.',
+                  icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={activeStep === 1 ? BLUE : '#9aa0a6'} strokeWidth="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+                },
+                {
+                  n: '03',
+                  label: 'Private Resolution',
+                  desc: 'Unhappy customers leave feedback privately. You resolve the issue directly; bad reviews never hit Google.',
+                  icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={activeStep === 2 ? BLUE : '#9aa0a6'} strokeWidth="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                },
+                {
+                  n: '04',
+                  label: 'Unified Analytics',
+                  desc: 'All ratings, public reviews, private feedback, and business insights are compiled in your dashboard.',
+                  icon: <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={activeStep === 3 ? BLUE : '#9aa0a6'} strokeWidth="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                }
+              ].map((step, idx) => {
+                const isActive = activeStep === idx;
+                return (
+                  <div 
+                    key={idx}
+                    onClick={() => setActiveStep(idx)}
+                    style={{
+                      padding: '24px',
+                      borderRadius: 16,
+                      background: '#fff',
+                      border: `2px solid ${isActive ? BLUE : '#e8eaed'}`,
+                      cursor: 'pointer',
+                      transition: 'all 0.25s ease',
+                      boxShadow: isActive ? '0 8px 24px rgba(26,115,232,0.06)' : 'none',
+                      textAlign: 'left'
+                    }}
+                    onMouseEnter={e => {
+                      if (!isActive) e.currentTarget.style.borderColor = '#c5d8fd';
+                    }}
+                    onMouseLeave={e => {
+                      if (!isActive) e.currentTarget.style.borderColor = '#e8eaed';
+                    }}
+                  >
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 16, marginBottom: 12 }}>
+                      <div style={{
+                        width: 36,
+                        height: 36,
+                        borderRadius: 10,
+                        background: isActive ? BLUE_LIGHT : '#f1f3f4',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        transition: 'all 0.25s'
+                      }}>
+                        {step.icon}
+                      </div>
+                      <div>
+                        <span style={{ fontSize: 11, fontWeight: 700, color: isActive ? BLUE : '#9aa0a6', letterSpacing: 1.5 }}>STEP {step.n}</span>
+                        <h3 style={{ fontSize: 16, fontWeight: 700, margin: '2px 0 0', color: '#202124' }}>{step.label}</h3>
+                      </div>
+                    </div>
+                    {/* Expandable description */}
+                    <p style={{
+                      margin: 0,
+                      fontSize: 13,
+                      color: '#5f6368',
+                      lineHeight: 1.6,
+                      display: 'block'
+                    }}>
+                      {step.desc}
+                    </p>
                   </div>
-                )}
-                <p style={{ fontSize: 11, fontWeight: 700, color: BLUE, margin: '0 0 8px', letterSpacing: 1.5, textTransform: 'uppercase' }}>Step {step.n}</p>
-                <h3 style={{ fontSize: 15, fontWeight: 700, color: '#202124', margin: '0 0 10px', lineHeight: 1.3 }}>{step.title}</h3>
-                <p style={{ fontSize: 13, color: '#5f6368', lineHeight: 1.65, margin: 0 }}>{step.desc}</p>
-              </div>
-            ))}
+                );
+              })}
+            </div>
+
+            {/* Right: Live Interactive Mockup Card Preview Panel */}
+            <div style={{
+              background: '#fff',
+              border: '1px solid #e8eaed',
+              borderRadius: 24,
+              padding: '40px 32px',
+              boxShadow: '0 12px 36px rgba(0,0,0,0.05)',
+              minHeight: 280,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxSizing: 'border-box',
+              position: 'relative',
+              overflow: 'hidden'
+            }} className="rm-fade-up">
+              
+              {/* Step 1 Visual */}
+              {activeStep === 0 && (
+                <div style={{ width: '100%', textAlign: 'center' }} className="rm-fade-up">
+                  <p style={{ margin: '0 0 10px', fontSize: 12, fontWeight: 700, color: '#9aa0a6', textTransform: 'uppercase', letterSpacing: 1 }}>Scan QR Code / Click Link</p>
+                  <div style={{ width: 110, height: 110, background: '#f8faff', border: `2px dashed ${BLUE}`, borderRadius: 12, margin: '0 auto 20px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke={BLUE} strokeWidth="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><line x1="7" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="17" y2="17"/><line x1="17" y1="7" x2="17" y2="7"/></svg>
+                  </div>
+                  <p style={{ margin: '0 0 10px', fontSize: 15, fontWeight: 700, color: '#202124' }}>Rate your experience</p>
+                  <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+                    {[1,2,3,4,5].map(s => (
+                      <svg key={s} width="28" height="28" viewBox="0 0 24 24" fill={s <= 4 ? '#fbbc05' : '#e8eaed'} style={{ transition: 'transform 0.2s', cursor: 'pointer' }} onMouseEnter={e => e.currentTarget.style.transform = 'scale(1.2)'} onMouseLeave={e => e.currentTarget.style.transform = 'scale(1)'}>
+                        <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                      </svg>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2 Visual */}
+              {activeStep === 1 && (
+                <div style={{ width: '100%', textAlign: 'center' }} className="rm-fade-up">
+                  <p style={{ margin: '0 0 20px', fontSize: 12, fontWeight: 700, color: '#9aa0a6', textTransform: 'uppercase', letterSpacing: 1 }}>Intelligent Routing</p>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+                    <div style={{ border: '2px solid #34a853', background: '#f6fbf7', borderRadius: 12, padding: 20 }}>
+                      <span style={{ fontSize: 11, background: '#34a853', color: '#fff', padding: '3px 8px', borderRadius: 100, fontWeight: 700 }}>4–5 ★ rating</span>
+                      <h4 style={{ margin: '14px 0 6px', fontSize: 14, fontWeight: 700, color: '#1b5e20' }}>Google Review</h4>
+                      <p style={{ margin: 0, fontSize: 11, color: '#5f6368', lineHeight: 1.4 }}>Guided publicly to build your global score.</p>
+                    </div>
+                    <div style={{ border: '2px solid #ea4335', background: '#fdf7f7', borderRadius: 12, padding: 20 }}>
+                      <span style={{ fontSize: 11, background: '#ea4335', color: '#fff', padding: '3px 8px', borderRadius: 100, fontWeight: 700 }}>1–3 ★ rating</span>
+                      <h4 style={{ margin: '14px 0 6px', fontSize: 14, fontWeight: 700, color: '#b71c1c' }}>Private Form</h4>
+                      <p style={{ margin: 0, fontSize: 11, color: '#5f6368', lineHeight: 1.4 }}>Sent directly to your team's inbox.</p>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3 Visual */}
+              {activeStep === 2 && (
+                <div style={{ width: '100%' }} className="rm-fade-up">
+                  <p style={{ margin: '0 0 16px', fontSize: 12, fontWeight: 700, color: '#9aa0a6', textTransform: 'uppercase', letterSpacing: 1, textAlign: 'center' }}>Captured Customer Form</p>
+                  <div style={{ background: '#f8fafc', borderRadius: 12, padding: 20, border: '1px solid #cbd5e1' }}>
+                    <p style={{ margin: '0 0 8px', fontSize: 13, fontWeight: 700, color: '#202124' }}>How can we make things right?</p>
+                    <div style={{ height: 48, background: '#fff', border: '1px solid #dadce0', borderRadius: 6, padding: '8px 12px', fontSize: 12, color: '#9aa0a6', boxSizing: 'border-box', marginBottom: 12 }}>
+                      "The service was slow today..."
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <span style={{ fontSize: 11, color: '#9aa0a6' }}>🔒 Captured privately</span>
+                      <div style={{ background: BLUE, color: '#fff', fontSize: 12, fontWeight: 600, padding: '8px 16px', borderRadius: 100, display: 'inline-block' }}>Submit Response</div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 4 Visual */}
+              {activeStep === 3 && (
+                <div style={{ width: '100%' }} className="rm-fade-up">
+                  <p style={{ margin: '0 0 16px', fontSize: 12, fontWeight: 700, color: '#9aa0a6', textTransform: 'uppercase', letterSpacing: 1, textAlign: 'center' }}>Real-time Dashboard Metrics</p>
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12, marginBottom: 12 }}>
+                    <div style={{ background: BLUE_LIGHT, borderRadius: 10, padding: 14 }}>
+                      <span style={{ fontSize: 11, color: '#5f6368' }}>Overall Score</span>
+                      <p style={{ margin: '4px 0 0', fontSize: 20, fontWeight: 700, color: BLUE }}>4.8 ★</p>
+                    </div>
+                    <div style={{ background: '#e8f5e0', borderRadius: 10, padding: 14 }}>
+                      <span style={{ fontSize: 11, color: '#5f6368' }}>Protection Rate</span>
+                      <p style={{ margin: '4px 0 0', fontSize: 20, fontWeight: 700, color: '#34a853' }}>100%</p>
+                    </div>
+                  </div>
+                  <div style={{ background: '#f1f3f4', borderRadius: 8, padding: '10px 14px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontSize: 12, fontWeight: 600, color: '#202124' }}>Recent Negative Review</span>
+                    <span style={{ fontSize: 11, fontWeight: 700, color: '#ea4335', background: '#ea433515', padding: '2px 8px', borderRadius: 100 }}>Diverted</span>
+                  </div>
+                </div>
+              )}
+
+            </div>
+
           </div>
+
         </div>
       </section>
 
-      <div style={{ height: 1, background: '#e8eaed', maxWidth: 1080, margin: '0 auto' }} />
 
       {/* ── SECTION: Make reviewing easier ── */}
       <section style={{ padding: '88px 32px' }}>
@@ -510,6 +659,14 @@ export default function LandingPage() {
         .rm-fade-up { animation: rm-fade-up 0.7s cubic-bezier(.22,.68,0,1.2) both; }
         .rm-fade-in-right { animation: rm-fade-right 0.8s 0.2s cubic-bezier(.22,.68,0,1.2) both; }
         .rm-float { animation: rm-float 3.5s ease-in-out infinite; }
+
+        /* ─── Interactive Flow Mobile Stacking ─── */
+        @media (max-width: 860px) {
+          .rm-interactive-flow {
+            grid-template-columns: 1fr !important;
+            gap: 32px !important;
+          }
+        }
 
         /* ─── Tablet / Mobile ─── */
         @media (max-width: 860px) {
