@@ -118,13 +118,7 @@ export default function LandingPage() {
             <img src={LOGO} alt="Logo" style={{ height: 38, objectFit: 'contain' }} />
           </a>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <button onClick={goToLogin} className="rm-nav-signin"
-              style={{ fontSize: 14, fontWeight: 500, color: BLUE, background: 'none', border: 'none', cursor: 'pointer', padding: '8px 16px', borderRadius: 100, transition: 'background 0.15s' }}
-              onMouseEnter={e => e.currentTarget.style.background = BLUE_LIGHT}
-              onMouseLeave={e => e.currentTarget.style.background = 'none'}>
-              Sign in
-            </button>
-            <Btn onClick={() => openModal('started')}>Get started</Btn>
+            <Btn onClick={goToLogin}>Login</Btn>
             <button onClick={() => setMenuOpen(!menuOpen)} className="rm-hamburger"
               style={{ display: 'none', background: 'none', border: 'none', cursor: 'pointer', padding: 8 }}>
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#5f6368" strokeWidth="2">
@@ -137,7 +131,7 @@ export default function LandingPage() {
           <div style={{ borderTop: '1px solid #e8eaed', padding: '16px 20px 24px' }}>
             <button onClick={() => { goToLogin(); setMenuOpen(false); }}
               style={{ width: '100%', fontSize: 15, fontWeight: 600, color: '#fff', background: BLUE, border: 'none', cursor: 'pointer', padding: '13px', borderRadius: 100 }}>
-              Sign in / Get started
+              Login
             </button>
           </div>
         )}
@@ -441,7 +435,7 @@ export default function LandingPage() {
                 }
               }}>
                 <h3 style={{ fontSize: 22, fontWeight: 700, margin: '0 0 8px', letterSpacing: '-0.5px' }}>
-                  {modalType === 'demo' ? 'Book a Demo' : 'Get started'}
+                  Book a Demo
                 </h3>
                 <p style={{ fontSize: 14, color: '#5f6368', margin: '0 0 24px', lineHeight: 1.4 }}>
                   {modalType === 'demo' 
@@ -479,10 +473,11 @@ export default function LandingPage() {
                 </div>
 
                 <div style={{ marginBottom: 24 }}>
-                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#202124', marginBottom: 6, textAlign: 'left' }}>Phone number</label>
+                  <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: '#202124', marginBottom: 6, textAlign: 'left' }}>Phone number *</label>
                   <input
                     type="tel"
-                    placeholder="+1 555-000-0000 (Optional)"
+                    required
+                    placeholder="+1 555-000-0000"
                     value={modalPhone}
                     onChange={e => setModalPhone(e.target.value)}
                     style={{ width: '100%', padding: '10px 14px', border: '1px solid #dadce0', borderRadius: 8, fontSize: 14, fontFamily: 'inherit', boxSizing: 'border-box', outline: 'none' }}
