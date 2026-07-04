@@ -51,7 +51,25 @@ async function apiFetch(path: string, options: RequestInit = {}) {
 
 export default function PublicFunnel() {
   const [searchParams] = useSearchParams();
-  const clientId = searchParams.get('clientId');
+
+  // Support both ?clientId=... and ?magic_token=... (JWT containing clientId)
+  const rawClientId = searchParams.get('clientId');
+  const magicToken = searchParams.get('magic_token');
+
+  function decodeJwtPayload(token: string): Record<string, string> | null {
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const json = decodeURIComponent(
+        atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+      );
+      return JSON.parse(json);
+    } catch {
+      return null;
+    }
+  }
+
+  const clientId = rawClientId || (magicToken ? decodeJwtPayload(magicToken)?.clientId ?? null : null);
   
   const [clientInfo, setClientInfo] = useState<{ name: string; google_review_link: string; copy_mode?: string; logo_url?: string } | null>(null);
   const [rating, setRating] = useState<number>(0);
