@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function LandingPage() {
+  const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeFeature, setActiveFeature] = useState(0);
@@ -18,14 +20,8 @@ export default function LandingPage() {
     return () => clearInterval(interval);
   }, []);
 
-  // Dev: reviewdash runs on port 5180. Prod: same domain under /reviewdash/
-  const goToLogin = () => {
-    if (import.meta.env.DEV) {
-      window.location.href = 'http://localhost:5180/reviewdash/login';
-    } else {
-      window.location.href = '/reviewdash/login';
-    }
-  };
+  // Login is now inside clientReview — same app, same port
+  const goToLogin = () => navigate('/login');
 
   const features = [
     {
@@ -162,7 +158,6 @@ export default function LandingPage() {
           {/* Logo */}
           <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14, marginBottom: 28 }}>
             <img src="./image.png" alt="Certifyied Reviews" style={{ height: 48, objectFit: 'contain' }} />
-            <span style={{ fontSize: 22, fontWeight: 600, color: '#202124', letterSpacing: '-0.5px' }}>Certifyied Reviews</span>
           </div>
 
           {/* Main headline */}
