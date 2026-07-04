@@ -403,6 +403,12 @@ export default function LandingPage() {
               <form onSubmit={async (e) => {
                 e.preventDefault();
                 if (!modalEmail) return;
+                const cleanPhone = modalPhone.replace(/\s+/g, '').replace(/[-\(\)]/g, '');
+                const indianPhoneRegex = /^(?:\+91|91|0)?[6-9]\d{9}$/;
+                if (!indianPhoneRegex.test(cleanPhone)) {
+                  setModalError('Please enter a valid 10-digit Indian phone number (e.g. +91 98765 43210).');
+                  return;
+                }
                 setModalSubmitting(true);
                 setModalError('');
                 try {
@@ -477,7 +483,7 @@ export default function LandingPage() {
                   <input
                     type="tel"
                     required
-                    placeholder="+1 555-000-0000"
+                    placeholder="+91 98765 43210"
                     value={modalPhone}
                     onChange={e => setModalPhone(e.target.value)}
                     style={{ width: '100%', padding: '10px 14px', border: '1px solid #dadce0', borderRadius: 8, fontSize: 14, fontFamily: 'inherit', boxSizing: 'border-box', outline: 'none' }}
