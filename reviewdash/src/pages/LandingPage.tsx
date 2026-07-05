@@ -142,26 +142,26 @@ export default function LandingPage() {
         )}
       </nav>
 
-            {/* ── HERO ── */}
-      <section style={{ paddingTop: 100, paddingBottom: 80, paddingLeft: 32, paddingRight: 32, textAlign: 'center' }}>
-        <div className="rm-hero-grid" style={{ maxWidth: 760, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 48, alignItems: 'center', textAlign: 'center' }}>
+                  {/* ── HERO ── */}
+      <section style={{ paddingTop: 100, paddingBottom: 80, paddingLeft: 32, paddingRight: 32 }}>
+        <div className="rm-hero-grid" style={{ maxWidth: 1080, margin: '0 auto' }}>
 
           {/* Left: text */}
-          <div className="rm-fade-up" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div className="rm-hero-text rm-fade-up">
             <h1 style={{ fontSize: 'clamp(36px, 4.5vw, 60px)', fontWeight: 700, lineHeight: 1.1, letterSpacing: '-2px', color: '#202124', margin: '0 0 22px' }}>
               Your reputation.<br /><span style={{ color: BLUE }}>Managed.</span>
             </h1>
-            <p style={{ fontSize: 'clamp(16px, 1.6vw, 18px)', color: '#5f6368', lineHeight: 1.75, maxWidth: 480, margin: '0 0 36px', textAlign: 'center' }}>
+            <p style={{ fontSize: 'clamp(16px, 1.6vw, 18px)', color: '#5f6368', lineHeight: 1.75, maxWidth: 420, margin: '0 0 36px' }}>
               Collect customer feedback, understand every experience and build a stronger online reputation.
             </p>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }} className="rm-hero-buttons">
               <Btn onClick={() => openModal('started')} large>Get started</Btn>
               <Btn onClick={() => openModal('demo')} outline large>Book a Demo</Btn>
             </div>
           </div>
 
           {/* Right: dashboard */}
-          <div className="rm-fade-in-right" style={{ position: 'relative', width: '100%', maxWidth: 560 }}>
+          <div className="rm-fade-in-right" style={{ position: 'relative', width: '100%' }}>
             <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8eaed', boxShadow: '0 8px 40px rgba(0,0,0,0.1)', overflow: 'hidden', textAlign: 'left' }}>
               <div style={{ background: '#f8f9fa', borderBottom: '1px solid #e8eaed', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div style={{ display: 'flex', gap: 5 }}>
