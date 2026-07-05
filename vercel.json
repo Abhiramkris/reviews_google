@@ -10,6 +10,10 @@
       "destination": "/reviewdash/index.html"
     },
     {
+      "source": "/s/(.*)",
+      "destination": "/reviewdash/index.html"
+    },
+    {
       "source": "/(.*)",
       "destination": "/reviewdash/index.html"
     }

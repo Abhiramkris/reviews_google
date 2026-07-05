@@ -6,6 +6,7 @@ import ClientDashboard from './pages/ClientDashboard';
 import SmartRoot from './SmartRoot';
 import BlogPage from './pages/BlogPage';
 import IndustryPage from './pages/IndustryPage';
+import ShortLinkRedirect from './pages/ShortLinkRedirect';
 
 const basename = window.location.pathname.startsWith('/clientReview') ? '/clientReview' : '';
 
@@ -30,6 +31,7 @@ function App() {
         <Route path="/feedback" element={<PublicFunnel />} />
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/industry/:industryId" element={<IndustryPage />} />
+        <Route path="/s/:slug" element={<ShortLinkRedirect />} />
 
         {/* Fallback to landing */}
         <Route path="*" element={<LandingPage />} />

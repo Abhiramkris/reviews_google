@@ -6,6 +6,7 @@ import AdminDashboard from './pages/AdminDashboard';
 import LandingPage from './pages/LandingPage';
 import BlogPage from './pages/BlogPage';
 import IndustryPage from './pages/IndustryPage';
+import ShortLinkRedirect from './pages/ShortLinkRedirect';
 
 const basename = window.location.pathname.startsWith('/reviewdash') ? '/reviewdash' : '';
 
@@ -21,6 +22,7 @@ function App() {
         <Route path="/industry/:industryId" element={<IndustryPage />} />
         <Route path="/dashboard" element={<ClientDashboard />} />
         <Route path="/admin" element={<AdminDashboard />} />
+        <Route path="/s/:slug" element={<ShortLinkRedirect />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>

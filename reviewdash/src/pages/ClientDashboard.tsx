@@ -76,6 +76,12 @@ export default function ClientDashboard() {
   const [copyMode, setCopyMode] = useState('auto');
   const [logoUrl, setLogoUrl] = useState('');
   const [uploadingLogo, setUploadingLogo] = useState(false);
+
+  const [slugs, setSlugs] = useState<string[]>([]);
+  const [newSlug, setNewSlug] = useState('');
+  const [slugLoading, setSlugLoading] = useState(false);
+  const [slugError, setSlugError] = useState('');
+  const [slugModalOpen, setSlugModalOpen] = useState(false);
   
   const navigate = useNavigate();
   const token = localStorage.getItem('review_auth_token') || getCookie('review_auth_token');
@@ -117,6 +123,23 @@ export default function ClientDashboard() {
           );
           setCopyMode(dashData.client.copy_mode || 'auto');
           setLogoUrl(dashData.client.logo_url || '');
+        }
+
+        // Fetch client slugs
+        const targetClientId = queryClientId || (token ? JSON.parse(window.atob(token.split('.')[1])).clientId : null);
+        if (targetClientId) {
+          apiFetch(`/api/reviews/clients/slugs?clientId=${targetClientId}`, {
+            headers: {
+              'Authorization': `Bearer ${token}`
+            }
+          })
+            .then(res => res.json())
+            .then((slugData: any) => {
+              if (Array.isArray(slugData)) {
+                setSlugs(slugData.map(s => s.slug));
+              }
+            })
+            .catch(console.error);
         }
       })
       .catch(err => {
@@ -259,6 +282,59 @@ export default function ClientDashboard() {
     }
   };
 
+  const handleCreateSlug = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newSlug.trim()) return;
+
+    setSlugLoading(true);
+    setSlugError('');
+
+    try {
+      const res = await apiFetch('/api/reviews/clients/slugs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          clientId: activeClientId,
+          slug: newSlug.trim()
+        })
+      });
+
+      const resData = await res.json();
+      if (!res.ok) throw new Error(resData.error || 'Failed to create short link.');
+
+      setSlugs([...slugs, resData.slug]);
+      setNewSlug('');
+    } catch (err: any) {
+      setSlugError(err.message || 'Action failed.');
+    } finally {
+      setSlugLoading(false);
+    }
+  };
+
+  const handleDeleteSlug = async (slugToDelete: string) => {
+    if (!confirm(`Are you sure you want to delete the short link /s/${slugToDelete}?`)) return;
+
+    setSlugError('');
+    try {
+      const res = await apiFetch(`/api/reviews/clients/slugs?slug=${slugToDelete}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      const resData = await res.json();
+      if (!res.ok) throw new Error(resData.error || 'Failed to delete short link.');
+
+      setSlugs(slugs.filter(s => s !== slugToDelete));
+    } catch (err: any) {
+      setSlugError(err.message || 'Action failed.');
+    }
+  };
+
   const addCustomSuggestion = () => {
     setCustomSuggestions([...customSuggestions, '']);
   };
@@ -348,23 +424,34 @@ export default function ClientDashboard() {
             </p>
           </div>
           {activeClientId && (
-            <button 
-              className={`btn ${copiedLink ? 'btn-secondary' : 'btn-primary'}`} 
-              onClick={() => copyFunnelLink(activeClientId as string)}
-              style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
-            >
-              {copiedLink ? (
-                <>
-                  <svg style={{ width: '14px', height: '14px', fill: 'currentColor' }} viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
-                  Copied Link!
-                </>
-              ) : (
-                <>
-                  <svg style={{ width: '14px', height: '14px', fill: 'currentColor' }} viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
-                  Copy Feedback Page Link
-                </>
-              )}
-            </button>
+            <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+              <button 
+                className={`btn ${copiedLink ? 'btn-secondary' : 'btn-primary'}`} 
+                onClick={() => copyFunnelLink(activeClientId as string)}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              >
+                {copiedLink ? (
+                  <>
+                    <svg style={{ width: '14px', height: '14px', fill: 'currentColor' }} viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                    Copied Link!
+                  </>
+                ) : (
+                  <>
+                    <svg style={{ width: '14px', height: '14px', fill: 'currentColor' }} viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 1.39 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+                    Copy Feedback Page Link
+                  </>
+                )}
+              </button>
+              <button 
+                type="button"
+                className="btn btn-secondary" 
+                onClick={() => setSlugModalOpen(true)}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
+              >
+                <svg style={{ width: '14px', height: '14px', fill: 'currentColor' }} viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 3.1 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+                Short Links
+              </button>
+            </div>
           )}
         </div>
 
@@ -634,6 +721,76 @@ export default function ClientDashboard() {
           )}
         </div>
 
+        {/* Shortened Review Links Card */}
+        <div className="dash-card">
+          <h3 className="dash-card-title" style={{ margin: '0 0 1.5rem', display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+            <svg style={{ width: '16px', height: '16px', fill: 'currentColor' }} viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 3.1 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg> Shortened Review Links
+          </h3>
+          <p style={{ color: '#64748b', fontSize: '0.9rem', marginBottom: '1.5rem', lineHeight: 1.5 }}>
+            Create up to 3 custom shortened links redirecting to your feedback portal. This is useful for sharing clean URLs on social media or SMS messages.
+          </p>
+
+          {slugError && <p style={{ color: '#ef4444', fontSize: '0.85rem', marginBottom: '1rem' }}>{slugError}</p>}
+
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem' }}>
+            {slugs.length === 0 ? (
+              <p style={{ color: '#94a3b8', fontSize: '0.9rem', margin: 0, fontStyle: 'italic' }}>No shortened links created yet.</p>
+            ) : (
+              slugs.map((slug, idx) => {
+                const shortUrl = `https://www.reviewmanager.in/s/${slug}`;
+                return (
+                  <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 16px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0', gap: '1rem', flexWrap: 'wrap' }}>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', minWidth: 0 }}>
+                      <span style={{ fontSize: '0.95rem', fontWeight: 500, color: '#1e293b', wordBreak: 'break-all' }}>{shortUrl}</span>
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.5rem', flexShrink: 0 }}>
+                      <button 
+                        type="button"
+                        className="btn btn-secondary btn-small"
+                        onClick={() => {
+                          navigator.clipboard.writeText(shortUrl);
+                          alert('Copied to clipboard!');
+                        }}
+                      >
+                        Copy
+                      </button>
+                      <button 
+                        type="button"
+                        className="btn btn-danger btn-small"
+                        onClick={() => handleDeleteSlug(slug)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {slugs.length < 3 && (
+            <form onSubmit={handleCreateSlug} style={{ display: 'flex', gap: '0.75rem', maxWidth: '500px', alignItems: 'flex-end', flexWrap: 'wrap' }}>
+              <div style={{ flex: 1, minWidth: '200px' }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 500, marginBottom: '0.5rem', color: '#475569' }}>Create Short Link</label>
+                <div style={{ display: 'flex', alignItems: 'center', background: '#fff', border: '1px solid #cbd5e1', borderRadius: '6px', padding: '0 12px', height: '42px' }}>
+                  <span style={{ color: '#94a3b8', fontSize: '0.9rem', userSelect: 'none', paddingRight: '2px' }}>reviewmanager.in/s/</span>
+                  <input
+                    type="text"
+                    placeholder="e.g. feedback"
+                    required
+                    value={newSlug}
+                    onChange={e => setNewSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, ''))}
+                    style={{ flex: 1, border: 'none', outline: 'none', padding: '10px 0', fontSize: '0.9rem', color: '#1e293b' }}
+                  />
+                </div>
+              </div>
+              <button type="submit" className="btn btn-primary" style={{ height: '42px', padding: '0 1.5rem' }} disabled={slugLoading}>
+                {slugLoading ? 'Creating...' : 'Create'}
+              </button>
+            </form>
+          )}
+        </div>
+
         <div className="dash-card">
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
             <h3 className="dash-card-title" style={{ marginBottom: 0, display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
@@ -732,6 +889,92 @@ export default function ClientDashboard() {
           <span style={{ fontSize: 13, color: '#bdc1c6' }}>© 2026 Review Manager</span>
         </div>
       </footer>
+
+      {slugModalOpen && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, padding: '1rem', boxSizing: 'border-box' }}>
+          <div style={{ background: '#fff', borderRadius: '12px', padding: '2rem', maxWidth: '500px', width: '100%', boxShadow: '0 10px 25px rgba(0,0,0,0.15)', position: 'relative', boxSizing: 'border-box' }}>
+            <button 
+              type="button"
+              onClick={() => {
+                setSlugModalOpen(false);
+                setSlugError('');
+              }}
+              style={{ position: 'absolute', top: '16px', right: '16px', background: 'none', border: 'none', fontSize: '1.25rem', cursor: 'pointer', color: '#94a3b8' }}
+            >
+              ✕
+            </button>
+            <h3 style={{ margin: '0 0 1rem', display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <svg style={{ width: '18px', height: '18px', fill: '#1a73e8' }} viewBox="0 0 24 24"><path d="M3.9 12c0-1.71 1.39-3.1 3.1-3.1h4V7H7c-2.76 0-5 2.24-5 5s2.24 5 5 5h4v-1.9H7c-1.71 0-3.1-1.39-3.1-3.1zM8 13h8v-2H8v2zm9-6h-4v1.9h4c1.71 0 3.1 3.1 3.1 3.1s-1.39 3.1-3.1 3.1h-4V17h4c2.76 0 5-2.24 5-5s-2.24-5-5-5z"/></svg>
+              Shortened Review Links
+            </h3>
+            <p style={{ color: '#64748b', fontSize: '0.85rem', marginBottom: '1.5rem', lineHeight: 1.5 }}>
+              Create up to 3 custom shortened links redirecting to your feedback portal.
+            </p>
+
+            {slugError && <p style={{ color: '#ef4444', fontSize: '0.85rem', marginBottom: '1rem', background: '#fef2f2', padding: '8px 12px', borderRadius: '6px', border: '1px solid #fee2e2' }}>{slugError}</p>}
+
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', marginBottom: '1.5rem', maxHeight: '200px', overflowY: 'auto' }}>
+              {slugs.length === 0 ? (
+                <p style={{ color: '#94a3b8', fontSize: '0.85rem', margin: 0, fontStyle: 'italic', padding: '1rem 0', textAlign: 'center' }}>No shortened links created yet.</p>
+              ) : (
+                slugs.map((slug, idx) => {
+                  const shortUrl = `https://www.reviewmanager.in/s/${slug}`;
+                  return (
+                    <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 12px', background: '#f8fafc', borderRadius: '8px', border: '1px solid #e2e8f0', gap: '1rem' }}>
+                      <span style={{ fontSize: '0.85rem', color: '#1e293b', wordBreak: 'break-all', fontWeight: 500 }}>{shortUrl}</span>
+                      <div style={{ display: 'flex', gap: '0.25rem', flexShrink: 0 }}>
+                        <button 
+                          type="button"
+                          className="btn btn-secondary btn-small"
+                          style={{ padding: '4px 8px', fontSize: '0.75rem' }}
+                          onClick={() => {
+                            navigator.clipboard.writeText(shortUrl);
+                            alert('Copied!');
+                          }}
+                        >
+                          Copy
+                        </button>
+                        <button 
+                          type="button"
+                          className="btn btn-danger btn-small"
+                          style={{ padding: '4px 8px', fontSize: '0.75rem' }}
+                          onClick={() => handleDeleteSlug(slug)}
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {slugs.length < 3 ? (
+              <form onSubmit={handleCreateSlug} style={{ display: 'flex', gap: '0.5rem', alignItems: 'flex-end' }}>
+                <div style={{ flex: 1 }}>
+                  <label style={{ display: 'block', fontSize: '0.8rem', fontWeight: 500, marginBottom: '0.4rem', color: '#475569' }}>Create Short Link </label>
+                  <div style={{ display: 'flex', alignItems: 'center', background: '#fff', border: '1px solid #cbd5e1', borderRadius: '6px', padding: '0 8px', height: '36px' }}>
+                    <span style={{ color: '#94a3b8', fontSize: '0.85rem', userSelect: 'none' }}>reviewmanager.in/s/</span>
+                    <input
+                      type="text"
+                      placeholder="e.g. feedback"
+                      required
+                      value={newSlug}
+                      onChange={e => setNewSlug(e.target.value.toLowerCase().replace(/[^a-z0-9-_]/g, ''))}
+                      style={{ flex: 1, border: 'none', outline: 'none', fontSize: '0.85rem', color: '#1e293b', background: 'transparent' }}
+                    />
+                  </div>
+                </div>
+                <button type="submit" className="btn btn-primary" style={{ height: '36px', padding: '0 1rem', fontSize: '0.85rem' }} disabled={slugLoading}>
+                  {slugLoading ? '...' : 'Create'}
+                </button>
+              </form>
+            ) : (
+              <p style={{ color: '#64748b', fontSize: '0.8rem', margin: 0, textAlign: 'center', padding: '8px', background: '#f8fafc', borderRadius: '6px', border: '1px solid #e2e8f0' }}>Maximum limit of 3 short links reached.</p>
+            )}
+          </div>
+        </div>
+      )}
 
     </div>
   );

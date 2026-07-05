@@ -144,24 +144,24 @@ export default function LandingPage() {
 
                   {/* ── HERO ── */}
       <section style={{ paddingTop: 100, paddingBottom: 80, paddingLeft: 32, paddingRight: 32 }}>
-        <div className="rm-hero-grid" style={{ maxWidth: 1080, margin: '0 auto', display: 'flex', flexDirection: 'row', gap: 56, alignItems: 'center', justifyContent: 'space-between' }}>
+        <div className="rm-hero-grid" style={{ maxWidth: 1080, margin: '0 auto' }}>
 
           {/* Left: text */}
-          <div className="rm-hero-text rm-fade-up" style={{ flex: 1.1, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', textAlign: 'left', minWidth: 280 }}>
+          <div className="rm-hero-text rm-fade-up" style={{ minWidth: 280 }}>
             <h1 style={{ fontSize: 'clamp(36px, 4.5vw, 60px)', fontWeight: 700, lineHeight: 1.1, letterSpacing: '-2px', color: '#202124', margin: '0 0 22px' }}>
               Your reputation.<br /><span style={{ color: BLUE }}>Managed.</span>
             </h1>
             <p style={{ fontSize: 'clamp(16px, 1.6vw, 18px)', color: '#5f6368', lineHeight: 1.75, maxWidth: 420, margin: '0 0 36px' }}>
               Collect customer feedback, understand every experience and build a stronger online reputation.
             </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap', justifyContent: 'flex-start' }} className="rm-hero-buttons">
+            <div className="rm-hero-buttons">
               <Btn onClick={() => openModal('started')} large>Get started</Btn>
               <Btn onClick={() => openModal('demo')} outline large>Book a Demo</Btn>
             </div>
           </div>
 
           {/* Right: dashboard */}
-          <div className="rm-fade-in-right" style={{ flex: 0.9, position: 'relative', width: '100%', minWidth: 280 }}>
+          <div className="rm-fade-in-right" style={{ position: 'relative', width: '100%', minWidth: 280 }}>
             <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8eaed', boxShadow: '0 8px 40px rgba(0,0,0,0.1)', overflow: 'hidden', textAlign: 'left' }}>
               <div style={{ background: '#f8f9fa', borderBottom: '1px solid #e8eaed', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
                 <div style={{ display: 'flex', gap: 5 }}>
@@ -421,9 +421,9 @@ export default function LandingPage() {
 
       {/* ── SECTION: Make reviewing easier ── */}
       <section style={{ padding: '88px 32px' }}>
-        <div className="rm-split-grid" style={{ maxWidth: 1080, margin: '0 auto', display: 'flex', flexDirection: 'row', gap: 72, alignItems: 'center' }}>
+        <div className="rm-split-grid" style={{ maxWidth: 1080, margin: '0 auto' }}>
           {/* Left: Text */}
-          <div className="rm-split-text" style={{ flex: 1, textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 280 }}>
+          <div className="rm-split-text" style={{ minWidth: 280 }}>
             <p style={{ fontSize: 13, fontWeight: 600, color: BLUE, textTransform: 'uppercase', letterSpacing: 2, margin: '0 0 14px' }}>For your customers</p>
             <h2 style={{ fontSize: 'clamp(26px, 3.5vw, 40px)', fontWeight: 700, letterSpacing: '-1px', color: '#202124', margin: '0 0 16px', lineHeight: 1.2 }}>Make reviewing easier.</h2>
             <p style={{ fontSize: 17, fontWeight: 600, color: '#3c4043', margin: '0 0 14px', lineHeight: 1.5 }}>A little help finding the right words.</p>
@@ -433,7 +433,7 @@ export default function LandingPage() {
             <Btn onClick={() => openModal('started')}>Get started</Btn>
           </div>
           {/* Right: Visual */}
-          <div className="rm-split-visual" style={{ flex: 1, width: '100%', minWidth: 280 }}>
+          <div className="rm-split-visual" style={{ width: '100%', minWidth: 280 }}>
             <div style={{ background: BLUE_XLIGHT, borderRadius: 20, padding: '32px', border: '1px solid #c5d8fd', textAlign: 'left' }}>
               <p style={{ fontSize: 12, color: '#9aa0a6', margin: '0 0 14px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1 }}>AI-suggested review draft</p>
               <div style={{ background: '#fff', borderRadius: 12, padding: '18px', border: '1px solid #e8eaed', marginBottom: 14 }}>
@@ -456,7 +456,7 @@ export default function LandingPage() {
       <section style={{ padding: '88px 32px', background: '#f8f9fa' }}>
         <div className="rm-split-grid" style={{ maxWidth: 1080, margin: '0 auto' }}>
           {/* Left: Private Dashboard Visual */}
-          <div className="rm-split-visual rm-split-left" style={{ flex: 1, width: '100%', minWidth: 280 }}>
+          <div className="rm-split-visual rm-split-left" style={{ width: '100%', minWidth: 280 }}>
             <div style={{ background: '#fff', borderRadius: 20, padding: '24px', border: '1px solid #e8eaed', boxShadow: '0 4px 24px rgba(0,0,0,0.06)', textAlign: 'left' }}>
               <p style={{ fontSize: 12, color: '#9aa0a6', margin: '0 0 16px', fontWeight: 600, textTransform: 'uppercase', letterSpacing: 1 }}>Private feedback dashboard</p>
               {[{ initials: 'AM', note: 'Waiting time was a bit long but overall great experience.', stars: 3, time: '2h ago' }, { initials: 'PK', note: 'Loved the service! Will definitely come back.', stars: 5, time: '5h ago' }, { initials: 'RS', note: 'Good quality but reception could be friendlier.', stars: 3, time: 'Yesterday' }].map((item, i) => (
@@ -474,7 +474,7 @@ export default function LandingPage() {
             </div>
           </div>
           {/* Right: Text */}
-          <div className="rm-split-text rm-split-right" style={{ flex: 1, textAlign: 'left', display: 'flex', flexDirection: 'column', alignItems: 'flex-start', minWidth: 280 }}>
+          <div className="rm-split-text rm-split-right" style={{ minWidth: 280 }}>
             <p style={{ fontSize: 13, fontWeight: 600, color: BLUE, textTransform: 'uppercase', letterSpacing: 2, margin: '0 0 14px' }}>For your team</p>
             <h2 style={{ fontSize: 'clamp(26px, 3.5vw, 40px)', fontWeight: 700, letterSpacing: '-1px', color: '#202124', margin: '0 0 16px', lineHeight: 1.2 }}>Feedback that helps you improve.</h2>
             <p style={{ fontSize: 17, fontWeight: 600, color: '#3c4043', margin: '0 0 14px', lineHeight: 1.5 }}>Understand what your customers love—and where you can do better.</p>
@@ -738,7 +738,42 @@ export default function LandingPage() {
         @import url('https://fonts.googleapis.com/css2?family=Google+Sans:wght@400;500;600;700&display=swap');
 
         /* ─── Hero Desktop Grid Styles ─── */
-        /* Desktop grid styles overridden by inline flex */
+        .rm-hero-grid {
+          display: grid;
+          grid-template-columns: 1.15fr 0.85fr;
+          gap: 56px;
+          align-items: center;
+        }
+        .rm-hero-text {
+          text-align: left;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .rm-hero-buttons {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          flex-wrap: wrap;
+          justify-content: flex-start;
+        }
+
+        /* ─── Split Sections Styles ─── */
+        .rm-split-grid {
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 72px;
+          align-items: center;
+        }
+        .rm-split-text {
+          text-align: left;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start;
+        }
+        .rm-split-visual {
+          width: 100%;
+        }
 
         @keyframes rm-pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:.5;transform:scale(1.3)} }
         @keyframes rm-fade-up { from{opacity:0;transform:translateY(24px)} to{opacity:1;transform:translateY(0)} }
@@ -748,19 +783,11 @@ export default function LandingPage() {
         .rm-fade-in-right { animation: rm-fade-right 0.8s 0.2s cubic-bezier(.22,.68,0,1.2) both; }
         .rm-float { animation: rm-float 3.5s ease-in-out infinite; }
 
-        /* ─── Split Sections Styles ─── */
-        /* Split grid styles overridden by inline flex */
-        @media (max-width: 860px) {
-          .rm-split-grid {
-            grid-template-columns: 1fr !important;
-            gap: 48px !important;
-          }
-          .rm-split-text {
-            text-align: center !important;
-            align-items: center !important;
-          }
-          .rm-split-right {
-            order: -1 !important;
+        @media (prefers-reduced-motion: reduce) {
+          .rm-fade-up, .rm-fade-in-right {
+            animation: none !important;
+            opacity: 1 !important;
+            transform: none !important;
           }
         }
 
@@ -776,19 +803,41 @@ export default function LandingPage() {
           .rm-nav-links { display: none !important; }
         }
 
-        /* ─── Tablet / Mobile ─── */
+        /* ─── Tablet / Mobile Breakpoint ─── */
         @media (max-width: 860px) {
           /* Hero: stack, center text */
           .rm-hero-grid {
-            grid-template-columns: 1fr !important;
-            gap: 0 !important;
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 40px !important;
+            text-align: center !important;
+            align-items: center !important;
+          }
+          .rm-hero-text {
+            align-items: center !important;
             text-align: center !important;
           }
-          .rm-hero-grid > div:first-child { order: 1; padding-bottom: 36px; }
-          .rm-hero-grid > div:first-child > div { justify-content: center !important; }
-          .rm-hero-grid > div:first-child p { margin-left: auto; margin-right: auto; }
-          .rm-hero-grid > div:last-child { order: 2; }
+          .rm-hero-buttons {
+            justify-content: center !important;
+          }
           .rm-badge { display: none !important; }
+
+          /* Split sections: stack columns */
+          .rm-split-grid {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 48px !important;
+          }
+          .rm-split-text {
+            text-align: center !important;
+            align-items: center !important;
+          }
+          .rm-split-left {
+            order: 2 !important; /* Visual mockup goes second */
+          }
+          .rm-split-right {
+            order: 1 !important; /* Text description goes first */
+          }
 
           /* Steps: 2-col then 1-col */
           .rm-steps-grid { grid-template-columns: 1fr 1fr !important; gap: 40px !important; }
