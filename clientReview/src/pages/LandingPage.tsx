@@ -126,38 +126,81 @@ export default function LandingPage() {
         )}
       </nav>
 
-      {/* ── HERO ── */}
-      <section style={{ paddingTop: 100, paddingBottom: 80, paddingLeft: 32, paddingRight: 32 }}>
-        <div className="rm-hero-grid" style={{ maxWidth: 1080, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 56, alignItems: 'center' }}>
+            {/* ── HERO ── */}
+      <section style={{ paddingTop: 100, paddingBottom: 80, paddingLeft: 32, paddingRight: 32, textAlign: 'center' }}>
+        <div className="rm-hero-grid" style={{ maxWidth: 760, margin: '0 auto', display: 'flex', flexDirection: 'column', gap: 48, alignItems: 'center', textAlign: 'center' }}>
 
           {/* Left: text */}
-          <div className="rm-fade-up" style={{ textAlign: 'left' }}>
+          <div className="rm-fade-up" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <h1 style={{ fontSize: 'clamp(36px, 4.5vw, 60px)', fontWeight: 700, lineHeight: 1.1, letterSpacing: '-2px', color: '#202124', margin: '0 0 22px' }}>
               Your reputation.<br /><span style={{ color: BLUE }}>Managed.</span>
             </h1>
-            <p style={{ fontSize: 'clamp(16px, 1.6vw, 18px)', color: '#5f6368', lineHeight: 1.75, maxWidth: 420, margin: '0 0 36px' }}>
+            <p style={{ fontSize: 'clamp(16px, 1.6vw, 18px)', color: '#5f6368', lineHeight: 1.75, maxWidth: 480, margin: '0 0 36px', textAlign: 'center' }}>
               Collect customer feedback, understand every experience and build a stronger online reputation.
             </p>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12, flexWrap: 'wrap' }}>
               <Btn onClick={() => openModal('started')} large>Get started</Btn>
               <Btn onClick={() => openModal('demo')} outline large>Book a Demo</Btn>
             </div>
           </div>
 
-                    {/* Right: dashboard image */}
-          <div className="rm-fade-in-right" style={{ position: 'relative' }}>
-            <img 
-              src={`${import.meta.env.BASE_URL}review_dashboard_mockup.png`} 
-              alt="Review Manager Dashboard Mockup" 
-              style={{ width: '100%', height: 'auto', borderRadius: 16, boxShadow: '0 8px 40px rgba(0,0,0,0.1)', border: '1px solid #e8eaed', boxSizing: 'border-box' }} 
-            />
+          {/* Right: dashboard */}
+          <div className="rm-fade-in-right" style={{ position: 'relative', width: '100%', maxWidth: 560 }}>
+            <div style={{ background: '#fff', borderRadius: 16, border: '1px solid #e8eaed', boxShadow: '0 8px 40px rgba(0,0,0,0.1)', overflow: 'hidden', textAlign: 'left' }}>
+              <div style={{ background: '#f8f9fa', borderBottom: '1px solid #e8eaed', padding: '10px 16px', display: 'flex', alignItems: 'center', gap: 8 }}>
+                <div style={{ display: 'flex', gap: 5 }}>
+                  {['#ff5f57', '#ffbd2e', '#28c840'].map(c => <div key={c} style={{ width: 9, height: 9, borderRadius: 5, background: c }} />)}
+                </div>
+                <div style={{ flex: 1, background: '#fff', borderRadius: 6, padding: '3px 12px', fontSize: 11, color: '#9aa0a6', border: '1px solid #e8eaed', maxWidth: 200, margin: '0 auto', textAlign: 'center' }}>Review Manager · Dashboard</div>
+              </div>
+              <div style={{ padding: '16px 18px 12px', borderBottom: '1px solid #f1f3f4', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                <div>
+                  <p style={{ margin: 0, fontSize: 13, fontWeight: 600, color: '#202124' }}>Good morning, Abhiram</p>
+                  <p style={{ margin: '2px 0 0', fontSize: 11, color: '#9aa0a6' }}>Here's what's happening today</p>
+                </div>
+                <div style={{ width: 30, height: 30, borderRadius: 15, background: BLUE, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700, color: '#fff' }}>A</div>
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: 1, background: '#f1f3f4' }}>
+                {[{ label: 'Overall Rating', value: '4.8', unit: '★', color: '#fbbc05' }, { label: 'Total Reviews', value: '1,284', unit: '', color: BLUE }, { label: 'To Google', value: '81%', unit: '', color: '#34a853' }, { label: 'Private', value: '243', unit: '', color: '#ea4335' }].map((s, i) => (
+                  <div key={i} style={{ background: '#fff', padding: '13px 16px' }}>
+                    <p style={{ margin: '0 0 3px', fontSize: 11, color: '#9aa0a6', fontWeight: 500 }}>{s.label}</p>
+                    <p style={{ margin: 0, fontSize: 20, fontWeight: 700, color: s.color, letterSpacing: '-0.5px' }}>{s.value}<span style={{ fontSize: 13 }}>{s.unit}</span></p>
+                  </div>
+                ))}
+              </div>
+              <div style={{ padding: '12px 18px' }}>
+                <p style={{ margin: '0 0 10px', fontSize: 11, fontWeight: 600, color: '#9aa0a6', textTransform: 'uppercase', letterSpacing: 1 }}>Recent Feedback</p>
+                {[{ init: 'PK', text: 'Loved the service! Will come back.', stars: 5, tag: 'Google', tc: BLUE }, { init: 'AM', text: 'Wait time was a bit long overall.', stars: 3, tag: 'Private', tc: '#ea4335' }, { init: 'RS', text: 'Very professional team, great work!', stars: 5, tag: 'Google', tc: BLUE }].map((f, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 9, padding: '8px 0', borderBottom: i < 2 ? '1px solid #f1f3f4' : 'none', alignItems: 'flex-start' }}>
+                    <div style={{ width: 24, height: 24, borderRadius: 12, background: BLUE_LIGHT, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 9, fontWeight: 700, color: BLUE, flexShrink: 0 }}>{f.init}</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 2 }}>
+                        <span style={{ fontSize: 10, color: '#fbbc05' }}>{'★'.repeat(f.stars)}</span>
+                        <span style={{ fontSize: 9, fontWeight: 600, color: f.tc, background: f.tc + '15', padding: '1px 6px', borderRadius: 100 }}>{f.tag}</span>
+                      </div>
+                      <p style={{ margin: 0, fontSize: 11, color: '#5f6368', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{f.text}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            {/* Floating badges — hidden on mobile via CSS */}
+            <div className="rm-badge rm-float" style={{ position: 'absolute', bottom: -14, left: -18, background: '#fff', borderRadius: 10, padding: '9px 13px', border: '1px solid #e8eaed', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: 9 }}>
+              <div style={{ width: 30, height: 30, borderRadius: 15, background: BLUE_LIGHT, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill={BLUE}><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+              </div>
+              <div><p style={{ margin: 0, fontSize: 12, fontWeight: 700, color: '#202124' }}>4.8 avg rating</p><p style={{ margin: 0, fontSize: 10, color: '#9aa0a6' }}>+0.4 this month</p></div>
+            </div>
+            <div className="rm-badge" style={{ position: 'absolute', top: -13, right: -14, background: '#fff', borderRadius: 9, padding: '8px 12px', border: '1px solid #e8eaed', boxShadow: '0 4px 20px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: 7 }}>
+              <div style={{ width: 7, height: 7, borderRadius: 4, background: '#34a853', animation: 'rm-pulse 2s infinite' }} />
+              <p style={{ margin: 0, fontSize: 11, fontWeight: 600, color: '#202124' }}>New review on Google</p>
+            </div>
           </div>
         </div>
       </section>
 
       <div style={{ height: 1, background: '#e8eaed', maxWidth: 1080, margin: '0 auto' }} />
 
-      
       {/* ── HOW IT WORKS (Everything in one place) — Interactive Step Flow ── */}
       <section id="how-it-works" style={{ padding: '96px 32px', background: '#f8faff' }}>
         <div style={{ maxWidth: 1080, margin: '0 auto' }}>
