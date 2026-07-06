@@ -99,6 +99,29 @@ export default function PublicFunnel() {
       })
       .then(data => {
         setClientInfo(data);
+
+        // Background pre-fetch of review suggestions
+        apiFetch(`/api/reviews/public/submit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            clientId,
+            rating: 5,
+            reviewer_name: 'Anonymous',
+            comment: 'Positive rating facilitation',
+            draft: true
+          })
+        })
+        .then(res => res.json())
+        .then(submitData => {
+          if (submitData.action === 'review_facilitation') {
+            setAiSuggestions(submitData.examples || []);
+            setGoogleLink(submitData.google_review_link || data.google_review_link || '');
+          }
+        })
+        .catch(err => {
+          console.warn('AI pre-fetch failed:', err);
+        });
       })
       .catch(err => {
         setErrorMsg(err.message || 'Error loading page.');
@@ -111,6 +134,23 @@ export default function PublicFunnel() {
 
     // If rating is 4 or 5, fetch suggestions and respect client's copy_mode setting
     if (selected >= 4) {
+      let activeCopyMode = clientInfo?.copy_mode || 'auto';
+      let targetLink = googleLink || clientInfo?.google_review_link || '';
+
+      // If we already pre-fetched the AI suggestions, use them directly and skip the loading spinner
+      if (aiSuggestions.length > 0) {
+        // Auto copy & redirect only if copy_mode is 'auto'
+        if (activeCopyMode === 'auto') {
+          const randomSuggestion = aiSuggestions[Math.floor(Math.random() * aiSuggestions.length)];
+          navigator.clipboard.writeText(randomSuggestion).finally(() => {
+            if (targetLink) {
+              window.location.href = targetLink;
+            }
+          });
+        }
+        return;
+      }
+
       setLoading(true);
       try {
         const res = await apiFetch(`/api/reviews/public/submit`, {
@@ -126,9 +166,7 @@ export default function PublicFunnel() {
         });
 
         const data = await res.json();
-        let targetLink = clientInfo?.google_review_link || '';
         let fetchedExamples: string[] = [];
-        let activeCopyMode = clientInfo?.copy_mode || 'auto';
 
         if (res.ok && data.action === 'review_facilitation') {
           fetchedExamples = data.examples || [];
@@ -142,6 +180,8 @@ export default function PublicFunnel() {
           fetchedExamples = shuffled.slice(0, 3);
           setAiSuggestions(fetchedExamples);
         }
+
+        setLoading(false);
 
         // Auto copy & redirect only if copy_mode is 'auto'
         if (activeCopyMode === 'auto') {
