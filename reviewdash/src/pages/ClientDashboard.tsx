@@ -85,6 +85,14 @@ export default function ClientDashboard() {
   const [slugError, setSlugError] = useState('');
   const [slugModalOpen, setSlugModalOpen] = useState(false);
   
+  // AI Simulation Test popup states
+  const [simModalOpen, setSimModalOpen] = useState(false);
+  const [simName, setSimName] = useState('');
+  const [simRating, setSimRating] = useState('5');
+  const [simComment, setSimComment] = useState('');
+  const [simReplyResult, setSimReplyResult] = useState('');
+  const [simLoading, setSimLoading] = useState(false);
+  
   const navigate = useNavigate();
   const token = localStorage.getItem('review_auth_token') || getCookie('review_auth_token');
 
@@ -787,12 +795,37 @@ export default function ClientDashboard() {
                   padding: '10px 20px',
                   borderRadius: '100px',
                   fontWeight: 500,
-                  fontSize: '14px'
+                  fontSize: '14px',
+                  marginRight: '8px'
                 }}
               >
                 <svg style={{ width: '16px', height: '16px', fill: '#fff' }} viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/></svg>
                 Sign in with Google (OAuth Setup)
               </a>
+
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => {
+                  setSimName('');
+                  setSimComment('');
+                  setSimRating('5');
+                  setSimReplyResult('');
+                  setSimModalOpen(true);
+                }}
+                style={{ 
+                  display: 'inline-flex', 
+                  alignItems: 'center', 
+                  gap: '6px',
+                  padding: '10px 20px',
+                  borderRadius: '100px',
+                  fontWeight: 500,
+                  fontSize: '14px'
+                }}
+              >
+                <svg style={{ width: '16px', height: '16px', fill: 'currentColor' }} viewBox="0 0 24 24"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/></svg>
+                Simulate AI Reply (Test Engine)
+              </button>
             </div>
           )}
         </div>
@@ -982,6 +1015,76 @@ export default function ClientDashboard() {
               </form>
             ) : (
               <p style={{ color: '#64748b', fontSize: '0.8rem', margin: 0, textAlign: 'center', padding: '8px', background: '#f8fafc', borderRadius: '6px', border: '1px solid #e2e8f0' }}>Maximum limit of 3 short links reached.</p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* AI auto-reply test simulator modal */}
+      {simModalOpen && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 1000, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)', padding: 20 }}>
+          <div style={{ background: '#fff', borderRadius: 16, maxWidth: 500, width: '100%', padding: '28px', boxShadow: '0 10px 40px rgba(0,0,0,0.25)', position: 'relative', boxSizing: 'border-box' }}>
+            <button onClick={() => setSimModalOpen(false)} style={{ position: 'absolute', top: 20, right: 20, background: 'none', border: 'none', cursor: 'pointer', fontSize: 22, color: '#9aa0a6' }}>&times;</button>
+            <h3 style={{ margin: '0 0 8px 0', fontSize: '1.25rem', fontWeight: 700 }}>AI Auto-Reply Simulator</h3>
+            <p style={{ margin: '0 0 20px 0', fontSize: '0.85rem', color: '#64748b', lineHeight: 1.4 }}>
+              Test how the AI replies to custom customer feedback using your active keywords: <strong>"{client.ai_keywords || 'None set'}"</strong>.
+            </p>
+
+            <form onSubmit={async (e) => {
+              e.preventDefault();
+              setSimLoading(true);
+              setSimReplyResult('');
+              try {
+                const res = await apiFetch('/api/reviews/simulate-reply', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                  body: JSON.stringify({
+                    clientId: activeClientId,
+                    reviewerName: simName || 'Test Customer',
+                    rating: parseInt(simRating),
+                    comment: simComment
+                  })
+                });
+                const resData = await res.json();
+                if (!res.ok) throw new Error(resData.error || 'Simulation failed.');
+                setSimReplyResult(resData.replyText);
+              } catch (err: any) {
+                alert(err.message);
+              } finally {
+                setSimLoading(false);
+              }
+            }}>
+              <div style={{ marginBottom: '14px' }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 500, marginBottom: '6px', color: '#334155' }}>Customer Name</label>
+                <input type="text" placeholder="e.g. John Doe" value={simName} onChange={e => setSimName(e.target.value)} style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.9rem' }} required />
+              </div>
+
+              <div style={{ marginBottom: '14px' }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 500, marginBottom: '6px', color: '#334155' }}>Rating</label>
+                <select value={simRating} onChange={e => setSimRating(e.target.value)} style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.9rem' }}>
+                  <option value="5">★★★★★ (5 Stars)</option>
+                  <option value="4">★★★★☆ (4 Stars)</option>
+                  <option value="3">★★★☆☆ (3 Stars)</option>
+                  <option value="2">★★☆☆☆ (2 Stars)</option>
+                  <option value="1">★☆☆☆☆ (1 Star)</option>
+                </select>
+              </div>
+
+              <div style={{ marginBottom: '20px' }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 500, marginBottom: '6px', color: '#334155' }}>Review Comment</label>
+                <textarea rows={3} placeholder="Write custom review text to test..." value={simComment} onChange={e => setSimComment(e.target.value)} style={{ width: '100%', padding: '8px 12px', border: '1px solid #cbd5e1', borderRadius: '6px', fontSize: '0.9rem', resize: 'vertical' }} />
+              </div>
+
+              <button type="submit" className="btn btn-primary" style={{ width: '100%', padding: '10px', fontSize: '0.95rem' }} disabled={simLoading}>
+                {simLoading ? 'Generating AI Response...' : 'Test AI Generation'}
+              </button>
+            </form>
+
+            {simReplyResult && (
+              <div style={{ marginTop: '20px', padding: '14px', background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '8px' }}>
+                <p style={{ margin: '0 0 6px 0', fontSize: '0.8rem', fontWeight: 600, color: '#475569' }}>DRAFTED RESPONSE:</p>
+                <p style={{ margin: 0, fontSize: '0.9rem', color: '#0f172a', lineHeight: 1.5 }}>{simReplyResult}</p>
+              </div>
             )}
           </div>
         </div>
