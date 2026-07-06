@@ -56,8 +56,8 @@ function App() {
         {/* Admin console — certifyied.com only */}
         <Route path="/admin" element={<AdminGuard />} />
 
-        {/* Public review funnel — certifyied.com only (reviewmanager.in goes to /dashboard) */}
-        <Route path="/feedback" element={<CertifyiedOnlyRoute element={<PublicFunnel />} />} />
+        {/* Public review funnel — accessible on all domains */}
+        <Route path="/feedback" element={<PublicFunnel />} />
 
         {/* Blog & industry pages — certifyied.com only */}
         <Route path="/blog" element={<CertifyiedOnlyRoute element={<BlogPage />} />} />
