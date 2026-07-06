@@ -113,8 +113,8 @@ export default function LandingPage() {
             <a href="#faq" style={{ fontSize: 14, fontWeight: 500, color: '#5f6368', textDecoration: 'none', transition: 'color 0.15s' }} onMouseEnter={e => e.currentTarget.style.color = BLUE} onMouseLeave={e => e.currentTarget.style.color = '#5f6368'}>FAQ</a>
             <a href="#blog" style={{ fontSize: 14, fontWeight: 500, color: '#5f6368', textDecoration: 'none', transition: 'color 0.15s' }} onMouseEnter={e => e.currentTarget.style.color = BLUE} onMouseLeave={e => e.currentTarget.style.color = '#5f6368'}>Blog</a>
             <a href="#" onClick={(e) => { e.preventDefault(); openModal('demo'); }} style={{ fontSize: 14, fontWeight: 500, color: '#5f6368', textDecoration: 'none', transition: 'color 0.15s' }} onMouseEnter={e => e.currentTarget.style.color = BLUE} onMouseLeave={e => e.currentTarget.style.color = '#5f6368'}>Contact</a>
-            <a href="#" style={{ fontSize: 14, fontWeight: 500, color: '#5f6368', textDecoration: 'none', transition: 'color 0.15s' }} onMouseEnter={e => e.currentTarget.style.color = BLUE} onMouseLeave={e => e.currentTarget.style.color = '#5f6368'}>Privacy Policy</a>
-            <a href="#" style={{ fontSize: 14, fontWeight: 500, color: '#5f6368', textDecoration: 'none', transition: 'color 0.15s' }} onMouseEnter={e => e.currentTarget.style.color = BLUE} onMouseLeave={e => e.currentTarget.style.color = '#5f6368'}>Terms</a>
+            <a href="/privacy" style={{ fontSize: 14, fontWeight: 500, color: '#5f6368', textDecoration: 'none', transition: 'color 0.15s' }} onMouseEnter={e => e.currentTarget.style.color = BLUE} onMouseLeave={e => e.currentTarget.style.color = '#5f6368'}>Privacy Policy</a>
+            <a href="/terms" style={{ fontSize: 14, fontWeight: 500, color: '#5f6368', textDecoration: 'none', transition: 'color 0.15s' }} onMouseEnter={e => e.currentTarget.style.color = BLUE} onMouseLeave={e => e.currentTarget.style.color = '#5f6368'}>Terms</a>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <Btn onClick={goToLogin}>Login</Btn>
@@ -132,8 +132,8 @@ export default function LandingPage() {
             <a href="#faq" onClick={() => setMenuOpen(false)} style={{ fontSize: 15, fontWeight: 500, color: '#202124', textDecoration: 'none' }}>FAQ</a>
             <a href="#blog" onClick={() => setMenuOpen(false)} style={{ fontSize: 15, fontWeight: 500, color: '#202124', textDecoration: 'none' }}>Blog</a>
             <a href="#" onClick={(e) => { e.preventDefault(); setMenuOpen(false); openModal('demo'); }} style={{ fontSize: 15, fontWeight: 500, color: '#202124', textDecoration: 'none' }}>Contact</a>
-            <a href="#" onClick={() => setMenuOpen(false)} style={{ fontSize: 15, fontWeight: 500, color: '#202124', textDecoration: 'none' }}>Privacy Policy</a>
-            <a href="#" onClick={() => setMenuOpen(false)} style={{ fontSize: 15, fontWeight: 500, color: '#202124', textDecoration: 'none' }}>Terms</a>
+            <a href="/privacy" onClick={() => setMenuOpen(false)} style={{ fontSize: 15, fontWeight: 500, color: '#202124', textDecoration: 'none' }}>Privacy Policy</a>
+            <a href="/terms" onClick={() => setMenuOpen(false)} style={{ fontSize: 15, fontWeight: 500, color: '#202124', textDecoration: 'none' }}>Terms</a>
             <button onClick={() => { goToLogin(); setMenuOpen(false); }}
               style={{ width: '100%', fontSize: 15, fontWeight: 600, color: '#fff', background: BLUE, border: 'none', cursor: 'pointer', padding: '13px', borderRadius: 100, marginTop: 8 }}>
               Login
@@ -609,11 +609,15 @@ export default function LandingPage() {
             <span style={{ fontSize: 13, color: '#9aa0a6', fontWeight: 500 }}>Review Manager</span>
           </div>
           <div style={{ display: 'flex', gap: 24 }}>
-            {['Privacy', 'Terms', 'Contact'].map(l => (
-              <a key={l} href="#" style={{ fontSize: 13, color: '#9aa0a6', textDecoration: 'none' }}
-                onMouseEnter={e => e.currentTarget.style.color = '#5f6368'}
-                onMouseLeave={e => e.currentTarget.style.color = '#9aa0a6'}>{l}</a>
-            ))}
+            <a href="/privacy" style={{ fontSize: 13, color: '#9aa0a6', textDecoration: 'none' }}
+              onMouseEnter={e => e.currentTarget.style.color = '#5f6368'}
+              onMouseLeave={e => e.currentTarget.style.color = '#9aa0a6'}>Privacy</a>
+            <a href="/terms" style={{ fontSize: 13, color: '#9aa0a6', textDecoration: 'none' }}
+              onMouseEnter={e => e.currentTarget.style.color = '#5f6368'}
+              onMouseLeave={e => e.currentTarget.style.color = '#9aa0a6'}>Terms</a>
+            <a href="#" style={{ fontSize: 13, color: '#9aa0a6', textDecoration: 'none' }}
+              onMouseEnter={e => e.currentTarget.style.color = '#5f6368'}
+              onMouseLeave={e => e.currentTarget.style.color = '#9aa0a6'}>Contact</a>
           </div>
           <span style={{ fontSize: 13, color: '#bdc1c6' }}>© 2026 Review Manager</span>
         </div>
