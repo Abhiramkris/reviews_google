@@ -283,7 +283,7 @@ export default function PublicFunnel() {
               )}
             </div>
             <div style={{ display: 'flex', flexDirection: 'column' }}>
-              <span style={{ fontSize: '14px', fontWeight: 500, color: '#202124' }}>Review Manager</span>
+              <span style={{ fontSize: '14px', fontWeight: 500, color: '#202124' }}>{clientInfo.name}</span>
               <span style={{ fontSize: '12px', color: '#5f6368', display: 'inline-flex', alignItems: 'center', gap: '4px' }}>
                 Posting publicly across Google 
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="#5f6368"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/></svg>
@@ -319,26 +319,17 @@ export default function PublicFunnel() {
           {!submitted && rating > 0 && !loading && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: '16px', flex: 1 }}>
               
-              {/* Textarea container */}
-              <div style={{ border: '1px solid #dadce0', borderRadius: '8px', padding: '12px', minHeight: '120px', display: 'flex', flexDirection: 'column' }}>
-                <textarea
-                  style={{ border: 'none', outline: 'none', width: '100%', resize: 'none', fontSize: '15px', fontFamily: 'inherit', color: '#202124', flex: 1, minHeight: '100px' }}
-                  placeholder="Share details of your own experience at this place"
-                  value={comment}
-                  onChange={e => setComment(e.target.value)}
-                />
-              </div>
-
-              {/* Add Photos Button */}
-              <div style={{ display: 'flex', justifyContent: 'center' }}>
-                <button 
-                  type="button" 
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', backgroundColor: '#e8f0fe', border: 'none', color: '#1a73e8', padding: '10px 24px', borderRadius: '100px', fontSize: '14px', fontWeight: 500, cursor: 'pointer' }}
-                >
-                  <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-                  Add photos
-                </button>
-              </div>
+              {/* Textarea — only shown for low ratings (1-3 stars) */}
+              {rating <= 3 && (
+                <div style={{ border: '1px solid #dadce0', borderRadius: '8px', padding: '12px', minHeight: '120px', display: 'flex', flexDirection: 'column' }}>
+                  <textarea
+                    style={{ border: 'none', outline: 'none', width: '100%', resize: 'none', fontSize: '15px', fontFamily: 'inherit', color: '#202124', flex: 1, minHeight: '100px' }}
+                    placeholder="Share details of your own experience at this place"
+                    value={comment}
+                    onChange={e => setComment(e.target.value)}
+                  />
+                </div>
+              )}
 
               {/* Suggestions Cards (For 4-5 Stars) */}
               {rating >= 4 && aiSuggestions.length > 0 && (

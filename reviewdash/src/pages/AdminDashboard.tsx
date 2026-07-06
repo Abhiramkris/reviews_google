@@ -74,6 +74,24 @@ export default function AdminDashboard() {
       return;
     }
 
+    // Security: decode token and block client-role users from admin console
+    try {
+      const base64Url = token.split('.')[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      const payload = JSON.parse(decodeURIComponent(
+        atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')
+      ));
+      if (payload.role === 'client') {
+        // review_clients users must never access the admin console
+        navigate('/dashboard', { replace: true });
+        return;
+      }
+    } catch {
+      // If token is malformed, kick to login
+      navigate('/login', { replace: true });
+      return;
+    }
+
     const loadData = async () => {
       try {
         // Fetch Projects
