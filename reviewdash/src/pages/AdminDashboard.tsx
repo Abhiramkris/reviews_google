@@ -56,6 +56,14 @@ export default function AdminDashboard() {
   const [projectId, setProjectId] = useState('');
   const [showForm, setShowForm] = useState(false);
 
+  // New Project modal states
+  const [projModalOpen, setProjModalOpen] = useState(false);
+  const [newProjName, setNewProjName] = useState('');
+  const [newProjUrl, setNewProjUrl] = useState('');
+  const [newProjEmail, setNewProjEmail] = useState('');
+  const [projLoading, setProjLoading] = useState(false);
+  const [projError, setProjError] = useState('');
+
   const navigate = useNavigate();
   
   const getCookie = (cname: string) => {
@@ -126,6 +134,57 @@ export default function AdminDashboard() {
 
     loadData();
   }, [token, navigate]);
+
+  const handleCreateProjectDirect = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setProjError('');
+    setProjLoading(true);
+
+    if (!newProjName.trim()) {
+      setProjError('Project name is required.');
+      setProjLoading(false);
+      return;
+    }
+
+    try {
+      const res = await apiFetch('/api/projects', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({
+          name: newProjName.trim(),
+          url: newProjUrl.trim(),
+          contact_email: newProjEmail.trim()
+        })
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Failed to create project.');
+
+      // Reload Projects
+      const projRes = await apiFetch('/api/projects', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const projData = await projRes.json();
+      const updatedList = projData.projects || [];
+      setProjects(updatedList);
+
+      // Auto-select newly created project
+      setProjectId(data.id);
+
+      // Reset & Close Modal
+      setNewProjName('');
+      setNewProjUrl('');
+      setNewProjEmail('');
+      setProjModalOpen(false);
+    } catch (err: any) {
+      setProjError(err.message || 'Failed to create project.');
+    } finally {
+      setProjLoading(false);
+    }
+  };
 
   const handleCreateOrUpdateClient = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -433,18 +492,28 @@ export default function AdminDashboard() {
                 {!editingClient && (
                   <div className="form-group">
                     <label>Assign to parent Project</label>
-                    <select
-                      className="form-control"
-                      style={{ height: '47px' }}
-                      required
-                      value={projectId}
-                      onChange={e => setProjectId(e.target.value)}
-                    >
-                      <option value="">-- Choose Project --</option>
-                      {projects.map(p => (
-                        <option key={p.id} value={p.id}>{p.name}</option>
-                      ))}
-                    </select>
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <select
+                        className="form-control"
+                        style={{ height: '47px', flex: 1 }}
+                        required
+                        value={projectId}
+                        onChange={e => setProjectId(e.target.value)}
+                      >
+                        <option value="">-- Choose Project --</option>
+                        {projects.map(p => (
+                          <option key={p.id} value={p.id}>{p.name}</option>
+                        ))}
+                      </select>
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => setProjModalOpen(true)}
+                        style={{ height: '47px', padding: '0 12px', display: 'flex', alignItems: 'center', justifyContent: 'center', whiteSpace: 'nowrap' }}
+                      >
+                        + Create Project
+                      </button>
+                    </div>
                   </div>
                 )}
               </div>
@@ -660,6 +729,86 @@ export default function AdminDashboard() {
         </div>
       </footer>
 
+      {/* Create Project Modal Popup */}
+      {projModalOpen && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(15, 23, 42, 0.65)', backdropFilter: 'blur(4px)', display: 'flex', justifyContent: 'center', alignItems: 'center', zIndex: 1000, padding: '20px' }}>
+          <div style={{ background: '#fff', borderRadius: '16px', maxWidth: '480px', width: '100%', padding: '28px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04)', boxSizing: 'border-box' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+              <h3 style={{ margin: 0, fontSize: '1.2rem', fontWeight: 700, color: '#0f172a' }}>Provision New Client Project</h3>
+              <button 
+                type="button" 
+                style={{ background: 'none', border: 'none', fontSize: '1.5rem', cursor: 'pointer', color: '#94a3b8' }} 
+                onClick={() => setProjModalOpen(false)}
+              >
+                ✕
+              </button>
+            </div>
+
+            {projError && (
+              <div style={{ backgroundColor: '#fef2f2', color: '#ef4444', padding: '10px 14px', borderRadius: '8px', fontSize: '0.8rem', marginBottom: '15px', border: '1px solid #fca5a5' }}>
+                {projError}
+              </div>
+            )}
+
+            <form onSubmit={handleCreateProjectDirect}>
+              <div className="form-group" style={{ marginBottom: '15px' }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 500, marginBottom: '6px', color: '#475569' }}>Project Name *</label>
+                <input 
+                  type="text" 
+                  className="form-control" 
+                  placeholder="e.g. Acme Corporation" 
+                  required 
+                  value={newProjName}
+                  onChange={e => setNewProjName(e.target.value)}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              <div className="form-group" style={{ marginBottom: '15px' }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 500, marginBottom: '6px', color: '#475569' }}>Website URL</label>
+                <input 
+                  type="url" 
+                  className="form-control" 
+                  placeholder="e.g. https://acme.com" 
+                  value={newProjUrl}
+                  onChange={e => setNewProjUrl(e.target.value)}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              <div className="form-group" style={{ marginBottom: '24px' }}>
+                <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 500, marginBottom: '6px', color: '#475569' }}>Contact Email</label>
+                <input 
+                  type="email" 
+                  className="form-control" 
+                  placeholder="e.g. contact@acme.com" 
+                  value={newProjEmail}
+                  onChange={e => setNewProjEmail(e.target.value)}
+                  style={{ width: '100%', padding: '10px 12px', borderRadius: '6px', border: '1px solid #cbd5e1', boxSizing: 'border-box' }}
+                />
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-end' }}>
+                <button 
+                  type="button" 
+                  className="btn btn-secondary" 
+                  onClick={() => setProjModalOpen(false)}
+                  disabled={projLoading}
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit" 
+                  className="btn btn-primary" 
+                  disabled={projLoading}
+                >
+                  {projLoading ? 'Creating...' : 'Create Project'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
