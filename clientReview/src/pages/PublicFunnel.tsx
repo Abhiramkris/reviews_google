@@ -90,11 +90,13 @@ export default function PublicFunnel() {
   const [showCopyModal, setShowCopyModal] = useState(false);
   const [copyText, setCopyText] = useState('');
   const [refreshing, setRefreshing] = useState(false);
+  const [refreshCount, setRefreshCount] = useState(0);
 
   const handleRefreshSuggestions = async () => {
     if (!clientId || refreshing) return;
     setRefreshing(true);
     setErrorMsg('');
+    const nextCount = refreshCount + 1;
     try {
       const res = await apiFetch(`/api/reviews/public/submit`, {
         method: 'POST',
@@ -105,13 +107,15 @@ export default function PublicFunnel() {
           reviewer_name: 'Anonymous',
           comment: 'Positive rating facilitation',
           draft: true,
-          refresh: true
+          refresh: true,
+          refreshCount: nextCount
         })
       });
 
       const data = await res.json();
       if (res.ok && data.action === 'review_facilitation') {
         setAiSuggestions(data.examples || []);
+        setRefreshCount(nextCount);
       } else {
         throw new Error(data.error || 'Failed to regenerate suggestions.');
       }
@@ -145,7 +149,8 @@ export default function PublicFunnel() {
             rating: 5,
             reviewer_name: 'Anonymous',
             comment: 'Positive rating facilitation',
-            draft: true
+            draft: true,
+            refreshCount: 0
           })
         })
         .then(res => res.json())
@@ -202,7 +207,8 @@ export default function PublicFunnel() {
             rating: selected,
             reviewer_name: 'Anonymous',
             comment: 'Positive rating facilitation',
-            draft: true
+            draft: true,
+            refreshCount
           })
         });
 
