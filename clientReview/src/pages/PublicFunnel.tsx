@@ -89,6 +89,38 @@ export default function PublicFunnel() {
   // Auto-copy loader modal states
   const [showCopyModal, setShowCopyModal] = useState(false);
   const [copyText, setCopyText] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
+
+  const handleRefreshSuggestions = async () => {
+    if (!clientId || refreshing) return;
+    setRefreshing(true);
+    setErrorMsg('');
+    try {
+      const res = await apiFetch(`/api/reviews/public/submit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          clientId,
+          rating: 5,
+          reviewer_name: 'Anonymous',
+          comment: 'Positive rating facilitation',
+          draft: true,
+          refresh: true
+        })
+      });
+
+      const data = await res.json();
+      if (res.ok && data.action === 'review_facilitation') {
+        setAiSuggestions(data.examples || []);
+      } else {
+        throw new Error(data.error || 'Failed to regenerate suggestions.');
+      }
+    } catch (err: any) {
+      setErrorMsg(err.message || 'Failed to refresh suggestions. Please try again.');
+    } finally {
+      setRefreshing(false);
+    }
+  };
 
   useEffect(() => {
     if (!clientId) {
@@ -389,9 +421,44 @@ export default function PublicFunnel() {
               {/* Suggestions Cards (For 4-5 Stars) */}
               {rating >= 4 && aiSuggestions.length > 0 && (
                 <div style={{ marginTop: '8px' }}>
-                  <span style={{ fontSize: '13px', color: '#5f6368', display: 'block', marginBottom: '8px', fontWeight: 500 }}>
-                    💡 Choose another template if you like:
-                  </span>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
+                    <span style={{ fontSize: '13px', color: '#5f6368', fontWeight: 500 }}>
+                      💡 Choose another template if you like:
+                    </span>
+                    <button
+                      onClick={handleRefreshSuggestions}
+                      disabled={refreshing}
+                      style={{
+                        border: 'none',
+                        background: 'none',
+                        color: '#1a73e8',
+                        cursor: refreshing ? 'not-allowed' : 'pointer',
+                        fontSize: '13px',
+                        fontWeight: 500,
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '4px',
+                        padding: '4px 8px',
+                        borderRadius: '4px',
+                        transition: 'background-color 0.2s',
+                        outline: 'none'
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.backgroundColor = '#f1f3f4'}
+                      onMouseLeave={e => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      {refreshing ? (
+                        <>
+                          <svg style={{ animation: 'spin 1.5s linear infinite' }} width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                          Regenerating...
+                        </>
+                      ) : (
+                        <>
+                          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="23 4 23 10 17 10"></polyline><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path></svg>
+                          Refresh Suggestions
+                        </>
+                      )}
+                    </button>
+                  </div>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                     {aiSuggestions.map((example, idx) => (
                       <div
