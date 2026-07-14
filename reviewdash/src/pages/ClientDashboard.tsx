@@ -817,6 +817,7 @@ export default function ClientDashboard() {
             </div>
           ) : (
             <div>
+              {/*
               <a 
                 href={`${LIVE_API_URL}/auth/google?clientId=${activeClientId}`}
                 className="btn btn-primary"
@@ -838,30 +839,8 @@ export default function ClientDashboard() {
                 <svg style={{ width: '16px', height: '16px', fill: '#fff' }} viewBox="0 0 24 24"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/></svg>
                 Sign in with Google (OAuth Setup)
               </a>
-
-              <button
-                type="button"
-                className="btn btn-secondary"
-                onClick={() => {
-                  setSimName('');
-                  setSimComment('');
-                  setSimRating('5');
-                  setSimReplyResult('');
-                  setSimModalOpen(true);
-                }}
-                style={{ 
-                  display: 'inline-flex', 
-                  alignItems: 'center', 
-                  gap: '6px',
-                  padding: '10px 20px',
-                  borderRadius: '100px',
-                  fontWeight: 500,
-                  fontSize: '14px'
-                }}
-              >
-                <svg style={{ width: '16px', height: '16px', fill: 'currentColor' }} viewBox="0 0 24 24"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7zm2.85 11.1l-.85.6V16h-4v-2.3l-.85-.6C7.8 12.16 7 10.63 7 9c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.63-.8 3.16-2.15 4.1z"/></svg>
-                Simulate AI Reply (Test Engine)
-              </button>
+              */}
+              <p style={{ margin: 0, fontSize: '0.85rem', color: '#64748b', fontStyle: 'italic' }}>Google Business Profile API configuration is currently undergoing verification review.</p>
             </div>
           )}
         </div>
