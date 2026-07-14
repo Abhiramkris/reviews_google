@@ -80,6 +80,8 @@ export default function ClientDashboard() {
   const [uploadingLogo, setUploadingLogo] = useState(false);
   const [clientName, setClientName] = useState('');
   const [clientEmail, setClientEmail] = useState('');
+  const [locations, setLocations] = useState<any[]>([]);
+  const [showLocationSelector, setShowLocationSelector] = useState(false);
 
   const [slugs, setSlugs] = useState<string[]>([]);
   const [newSlug, setNewSlug] = useState('');
@@ -96,11 +98,8 @@ export default function ClientDashboard() {
       return;
     }
 
-    const path = queryClientId 
-      ? `/api/reviews/client/dashboard?clientId=${queryClientId}`
-      : `/api/reviews/client/dashboard`;
-
-    apiFetch(path, {
+    // 1. Fetch all locations assigned to this client's email first
+    apiFetch('/api/reviews/clients/locations', {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -112,41 +111,72 @@ export default function ClientDashboard() {
           navigate('/login');
           throw new Error('Session expired.');
         }
-        if (!res.ok) throw new Error('Failed to load dashboard data.');
+        if (!res.ok) throw new Error('Failed to load locations.');
         return res.json();
       })
-      .then((dashData: DashboardData) => {
-        setData(dashData);
-        if (dashData.client) {
-          setGoogleReviewLink(dashData.client.google_review_link || '');
-          setAiKeywords(dashData.client.ai_keywords || '');
-          setSuggestionType(dashData.client.suggestion_type || 'ai');
-          setCustomSuggestions(Array.isArray(dashData.client.custom_suggestions) && dashData.client.custom_suggestions.length > 0 
-            ? dashData.client.custom_suggestions 
-            : ['']
-          );
-          setCopyMode(dashData.client.copy_mode || 'auto');
-          setLogoUrl(dashData.client.logo_url || '');
-          setClientName(dashData.client.name || '');
-          setClientEmail(dashData.client.email || '');
+      .then((locData: any) => {
+        const locs = locData.locations || [];
+        setLocations(locs);
+
+        // If there are multiple projects and no specific clientId query param is active, show the selector
+        if (locs.length > 1 && !queryClientId) {
+          setShowLocationSelector(true);
+          setLoading(false);
+          return;
         }
 
-        // Fetch client slugs
-        const targetClientId = queryClientId || (token ? JSON.parse(window.atob(token.split('.')[1])).clientId : null);
-        if (targetClientId) {
-          apiFetch(`/api/reviews/clients/slugs?clientId=${targetClientId}`, {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
+        // Determine target client ID based on query or single location
+        let targetId = queryClientId;
+        if (!targetId) {
+          targetId = locs.length > 0 ? locs[0].id : null;
+        }
+
+        if (!targetId) {
+          throw new Error('No project location configured.');
+        }
+
+        setShowLocationSelector(false);
+        const path = `/api/reviews/client/dashboard?clientId=${targetId}`;
+
+        return apiFetch(path, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        })
+          .then(res => {
+            if (!res.ok) throw new Error('Failed to load dashboard data.');
+            return res.json();
           })
-            .then(res => res.json())
-            .then((slugData: any) => {
-              if (Array.isArray(slugData)) {
-                setSlugs(slugData.map(s => s.slug));
+          .then((dashData: DashboardData) => {
+            setData(dashData);
+            if (dashData.client) {
+              setGoogleReviewLink(dashData.client.google_review_link || '');
+              setAiKeywords(dashData.client.ai_keywords || '');
+              setSuggestionType(dashData.client.suggestion_type || 'ai');
+              setCustomSuggestions(Array.isArray(dashData.client.custom_suggestions) && dashData.client.custom_suggestions.length > 0 
+                ? dashData.client.custom_suggestions 
+                : ['']
+              );
+              setCopyMode(dashData.client.copy_mode || 'auto');
+              setLogoUrl(dashData.client.logo_url || '');
+              setClientName(dashData.client.name || '');
+              setClientEmail(dashData.client.email || '');
+            }
+
+            // Fetch client slugs
+            return apiFetch(`/api/reviews/clients/slugs?clientId=${targetId}`, {
+              headers: {
+                'Authorization': `Bearer ${token}`
               }
             })
-            .catch(console.error);
-        }
+              .then(res => res.json())
+              .then((slugData: any) => {
+                if (Array.isArray(slugData)) {
+                  setSlugs(slugData.map(s => s.slug));
+                }
+              })
+              .catch(console.error);
+          });
       })
       .catch(err => {
         setErrorMsg(err.message || 'Error occurred.');
@@ -367,6 +397,64 @@ export default function ClientDashboard() {
     );
   };
 
+  if (showLocationSelector) {
+    return (
+      <div style={{ display: 'flex', minHeight: '100vh', justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8fafc', padding: '20px' }}>
+        <div style={{ background: '#fff', borderRadius: '16px', maxWidth: '500px', width: '100%', padding: '32px', boxShadow: '0 4px 20px rgba(0,0,0,0.05)', border: '1px solid #e2e8f0', boxSizing: 'border-box' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+            <h2 style={{ fontSize: '1.25rem', fontWeight: 700, margin: 0, color: '#1e293b' }}>Select Location / Project</h2>
+            <button className="btn btn-danger btn-small" onClick={handleLogout}>Logout</button>
+          </div>
+          <p style={{ fontSize: '0.85rem', color: '#64748b', margin: '0 0 24px', lineHeight: 1.5 }}>
+            Your account email is associated with multiple business locations. Choose one to open its feedback dashboard:
+          </p>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+            {locations.map((loc) => (
+              <div 
+                key={loc.id}
+                onClick={() => {
+                  setLoading(true);
+                  navigate(`?clientId=${loc.id}`);
+                }}
+                style={{ 
+                  display: 'flex', 
+                  alignItems: 'center', 
+                  gap: '12px', 
+                  padding: '14px 16px', 
+                  border: '1px solid #e2e8f0', 
+                  borderRadius: '12px', 
+                  cursor: 'pointer',
+                  transition: 'all 0.2s',
+                  background: '#f8fafc'
+                }}
+                onMouseEnter={e => {
+                  e.currentTarget.style.borderColor = '#4285F4';
+                  e.currentTarget.style.background = '#f0f7ff';
+                }}
+                onMouseLeave={e => {
+                  e.currentTarget.style.borderColor = '#e2e8f0';
+                  e.currentTarget.style.background = '#f8fafc';
+                }}
+              >
+                {loc.logo_url ? (
+                  <img src={loc.logo_url} alt="" style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'contain', background: '#fff', border: '1px solid #cbd5e1' }} />
+                ) : (
+                  <div style={{ width: '40px', height: '40px', borderRadius: '50%', backgroundColor: '#e2e8f0', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.25rem', color: '#64748b', fontWeight: 600 }}>
+                    {loc.name.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <div style={{ flex: 1 }}>
+                  <h4 style={{ margin: 0, fontSize: '0.95rem', fontWeight: 600, color: '#1e293b' }}>{loc.name}</h4>
+                  <p style={{ margin: '2px 0 0', fontSize: '0.75rem', color: '#64748b', wordBreak: 'break-all' }}>{loc.google_review_link || 'No Review Link set'}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div style={{ display: 'flex', minHeight: '100vh', justifyContent: 'center', alignItems: 'center', backgroundColor: '#f8fafc' }}>
@@ -409,6 +497,11 @@ export default function ClientDashboard() {
           <img src={`${import.meta.env.BASE_URL}image.png`} alt="Logo" style={{ height: '32px', objectFit: 'contain' }} />
         </div>
         <div className="dash-nav-actions">
+          {locations.length > 1 && (
+            <button className="btn btn-secondary btn-small" onClick={() => setShowLocationSelector(true)} style={{ marginRight: '8px' }}>
+              ⇄ Switch Location
+            </button>
+          )}
           {queryClientId && (
             <button className="btn btn-secondary btn-small" onClick={() => navigate('/admin')}>
               ← Back to Admin

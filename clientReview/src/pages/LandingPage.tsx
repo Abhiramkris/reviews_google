@@ -615,6 +615,9 @@ export default function LandingPage() {
             <a href="/terms" style={{ fontSize: 13, color: '#9aa0a6', textDecoration: 'none' }}
               onMouseEnter={e => e.currentTarget.style.color = '#5f6368'}
               onMouseLeave={e => e.currentTarget.style.color = '#9aa0a6'}>Terms</a>
+            <a href="/certlogin" style={{ fontSize: 13, color: '#9aa0a6', textDecoration: 'none' }}
+              onMouseEnter={e => e.currentTarget.style.color = '#5f6368'}
+              onMouseLeave={e => e.currentTarget.style.color = '#9aa0a6'}>Admin Login</a>
             <a href="#" style={{ fontSize: 13, color: '#9aa0a6', textDecoration: 'none' }}
               onMouseEnter={e => e.currentTarget.style.color = '#5f6368'}
               onMouseLeave={e => e.currentTarget.style.color = '#9aa0a6'}>Contact</a>
