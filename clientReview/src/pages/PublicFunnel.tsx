@@ -85,6 +85,10 @@ export default function PublicFunnel() {
   const [googleLink, setGoogleLink] = useState('');
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
+  
+  // Auto-copy loader modal states
+  const [showCopyModal, setShowCopyModal] = useState(false);
+  const [copyText, setCopyText] = useState('');
 
   useEffect(() => {
     if (!clientId) {
@@ -142,10 +146,15 @@ export default function PublicFunnel() {
         // Auto copy & redirect only if copy_mode is 'auto'
         if (activeCopyMode === 'auto') {
           const randomSuggestion = aiSuggestions[Math.floor(Math.random() * aiSuggestions.length)];
+          setCopyText(randomSuggestion);
+          setShowCopyModal(true);
+          
           navigator.clipboard.writeText(randomSuggestion).finally(() => {
-            if (targetLink) {
-              window.location.href = targetLink;
-            }
+            setTimeout(() => {
+              if (targetLink) {
+                window.location.href = targetLink;
+              }
+            }, 2500);
           });
         }
         return;
@@ -191,6 +200,9 @@ export default function PublicFunnel() {
           const selectedTemplate = candidates[randomIndex];
 
           // Auto copy to clipboard
+          setCopyText(selectedTemplate);
+          setShowCopyModal(true);
+
           try {
             await navigator.clipboard.writeText(selectedTemplate);
             setCopiedIndex(randomIndex);
@@ -198,7 +210,7 @@ export default function PublicFunnel() {
             console.warn("Failed to auto-copy to clipboard:", copyErr);
           }
 
-          // Auto redirect to Google Reviews in new tab
+          // Log redirection in background
           if (targetLink) {
             apiFetch(`/api/reviews/public/submit`, {
               method: 'POST',
@@ -212,7 +224,10 @@ export default function PublicFunnel() {
               })
             }).catch(err => console.error("Failed to log redirection:", err));
 
-            window.open(targetLink, '_blank');
+            // Wait 2.5 seconds to show the copied modal/loader, then redirect
+            setTimeout(() => {
+              window.location.href = targetLink;
+            }, 2500);
           }
         }
       } catch (err: any) {
@@ -469,6 +484,45 @@ export default function PublicFunnel() {
 
         </div>
       </div>
+
+      {/* Copy Modal Overlay with Loader */}
+      {showCopyModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(32, 33, 36, 0.95)', zIndex: 10000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '24px', boxSizing: 'border-box' }}>
+          <div style={{ maxWidth: '440px', width: '100%', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '20px' }}>
+            
+            {/* Spinning loader animation */}
+            <div style={{ position: 'relative', width: '70px', height: '70px' }}>
+              <div style={{ boxSizing: 'border-box', display: 'block', position: 'absolute', width: '64px', height: '64px', margin: '3px', border: '5px solid #ffffff', borderRadius: '50%', animation: 'spin 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite', borderColor: '#ffffff transparent transparent transparent' }} />
+              <div style={{ position: 'absolute', top: '23px', left: '23px', fontSize: '24px', color: '#ffffff' }}>📋</div>
+            </div>
+
+            <h2 style={{ color: '#ffffff', fontSize: '20px', fontWeight: 500, margin: '8px 0 0', fontFamily: 'Roboto, Arial, sans-serif' }}>
+              Copying review suggestion...
+            </h2>
+            
+            <p style={{ color: '#bdc1c6', fontSize: '14px', lineHeight: '1.6', margin: 0 }}>
+              We have copied your review text. Redirecting you to Google Reviews where you can paste it!
+            </p>
+
+            <div style={{ background: 'rgba(255, 255, 255, 0.08)', borderRadius: '12px', padding: '16px', border: '1px solid rgba(255, 255, 255, 0.1)', width: '100%', boxSizing: 'border-box' }}>
+              <p style={{ color: '#e8eaed', fontSize: '13px', fontStyle: 'italic', margin: 0, lineHeight: 1.4, textAlign: 'left' }}>
+                "{copyText}"
+              </p>
+            </div>
+            
+            <span style={{ color: '#80868b', fontSize: '11px', display: 'block', marginTop: '12px' }}>
+              Simply right-click or long-press on mobile and choose Paste!
+            </span>
+          </div>
+
+          <style>{`
+            @keyframes spin {
+              0% { transform: rotate(0deg); }
+              100% { transform: rotate(360deg); }
+            }
+          `}</style>
+        </div>
+      )}
     </div>
   );
 }
