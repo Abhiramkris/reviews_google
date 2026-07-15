@@ -42,6 +42,15 @@ export default function AdminDashboard() {
   const [errorMsg, setErrorMsg] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
+  // Tab State
+  const [activeTab, setActiveTab] = useState<'clients' | 'monitoring'>('clients');
+  const [monitoringData, setMonitoringData] = useState<{
+    recentLogs: any[];
+    aiCallsCount: number;
+    cronRunsCount: number;
+  } | null>(null);
+  const [monitoringLoading, setMonitoringLoading] = useState(false);
+
   // Form States
   const [editingClient, setEditingClient] = useState<Client | null>(null);
   const [name, setName] = useState('');
@@ -134,6 +143,31 @@ export default function AdminDashboard() {
 
     loadData();
   }, [token, navigate]);
+
+  const loadMonitoringData = async () => {
+    setMonitoringLoading(true);
+    try {
+      const res = await apiFetch('/api/reviews/admin/monitoring', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setMonitoringData(data);
+      } else {
+        console.error("Failed to load monitoring data");
+      }
+    } catch (e) {
+      console.error("Monitoring fetch error:", e);
+    } finally {
+      setMonitoringLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 'monitoring' && token) {
+      loadMonitoringData();
+    }
+  }, [activeTab, token]);
 
   const handleCreateProjectDirect = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -395,11 +429,29 @@ export default function AdminDashboard() {
             </p>
           </div>
           
-          {!showForm && (
+          {activeTab === 'clients' && !showForm && (
             <button className="btn btn-primary" onClick={() => setShowForm(true)}>
               + Add Client Profile
             </button>
           )}
+        </div>
+
+        {/* Navigation Tabs */}
+        <div style={{ display: 'flex', gap: '1rem', borderBottom: '1px solid #e2e8f0', marginBottom: '1.5rem' }}>
+          <button 
+            type="button"
+            style={{ padding: '0.75rem 1rem', border: 'none', borderBottom: activeTab === 'clients' ? '2px solid #2563eb' : '2px solid transparent', background: 'none', fontWeight: activeTab === 'clients' ? 600 : 500, color: activeTab === 'clients' ? '#2563eb' : '#64748b', cursor: 'pointer' }}
+            onClick={() => { setActiveTab('clients'); resetForm(); }}
+          >
+            Clients Management
+          </button>
+          <button 
+            type="button"
+            style={{ padding: '0.75rem 1rem', border: 'none', borderBottom: activeTab === 'monitoring' ? '2px solid #2563eb' : '2px solid transparent', background: 'none', fontWeight: activeTab === 'monitoring' ? 600 : 500, color: activeTab === 'monitoring' ? '#2563eb' : '#64748b', cursor: 'pointer' }}
+            onClick={() => setActiveTab('monitoring')}
+          >
+            System Monitoring
+          </button>
         </div>
 
         {errorMsg && (
@@ -415,7 +467,7 @@ export default function AdminDashboard() {
         )}
 
         {/* Add/Edit Form Card */}
-        {showForm && (
+        {activeTab === 'clients' && showForm && (
           <div className="dash-card">
             <h3 className="dash-card-title">
               {editingClient ? `Edit Client: ${editingClient.name}` : 'Register New Client Profile'}
@@ -619,7 +671,8 @@ export default function AdminDashboard() {
         )}
 
         {/* Registered Clients List */}
-        <div className="dash-card">
+        {activeTab === 'clients' && (
+          <div className="dash-card">
           <h3 className="dash-card-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
             <svg style={{ width: '18px', height: '18px', fill: 'currentColor' }} viewBox="0 0 24 24"><path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/></svg> Active Client Profiles
           </h3>
@@ -709,6 +762,106 @@ export default function AdminDashboard() {
             </div>
           )}
         </div>
+        )}
+
+        {/* System Monitoring Tab */}
+        {activeTab === 'monitoring' && (
+          <div>
+            {/* Stats Cards */}
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+              <div className="dash-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', borderLeft: '4px solid #10b981' }}>
+                <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 500 }}>AI API Calls (Last 30 Days)</span>
+                <span style={{ fontSize: '2rem', fontWeight: 700, color: '#0f172a' }}>{monitoringData?.aiCallsCount ?? 0}</span>
+                <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Logs of Nvidia / OpenRouter requests</span>
+              </div>
+              <div className="dash-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', borderLeft: '4px solid #3b82f6' }}>
+                <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 500 }}>Cron Cache Runs (Last 30 Days)</span>
+                <span style={{ fontSize: '2rem', fontWeight: 700, color: '#0f172a' }}>{monitoringData?.cronRunsCount ?? 0}</span>
+                <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Automated background refreshes</span>
+              </div>
+              <div className="dash-card" style={{ padding: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem', borderLeft: '4px solid #8b5cf6' }}>
+                <span style={{ fontSize: '0.85rem', color: '#64748b', fontWeight: 500 }}>Active Provider Mode</span>
+                <span style={{ fontSize: '1.25rem', fontWeight: 700, color: '#0f172a', textTransform: 'capitalize', marginTop: '0.5rem' }}>NVIDIA Direct</span>
+                <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Serving with 20-item cache queue</span>
+              </div>
+            </div>
+
+            {/* Refresh Button */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '1rem' }}>
+              <button 
+                type="button" 
+                className="btn btn-secondary btn-small"
+                onClick={loadMonitoringData}
+                disabled={monitoringLoading}
+              >
+                {monitoringLoading ? 'Refreshing...' : 'Refresh Logs'}
+              </button>
+            </div>
+
+            {/* Recent Audit Logs Table */}
+            <div className="dash-card" style={{ padding: '1.5rem' }}>
+              <h3 style={{ margin: '0 0 1rem 0', fontSize: '1.1rem', color: '#0f172a' }}>Recent Activity Logs</h3>
+              <div style={{ maxHeight: '500px', overflowY: 'auto' }}>
+                <table className="dash-table">
+                  <thead>
+                    <tr>
+                      <th>Time</th>
+                      <th>Action</th>
+                      <th>Identity / Email</th>
+                      <th>Details</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {!monitoringData || monitoringData.recentLogs.length === 0 ? (
+                      <tr>
+                        <td colSpan={4} style={{ textAlign: 'center', color: '#64748b', padding: '2rem' }}>
+                          No recent system activity logs found.
+                        </td>
+                      </tr>
+                    ) : (
+                      monitoringData.recentLogs.map((log: any) => (
+                        <tr key={log.id}>
+                          <td style={{ fontSize: '0.85rem', color: '#64748b', whiteSpace: 'nowrap' }}>
+                            {new Date(log.created_at).toLocaleString()}
+                          </td>
+                          <td>
+                            <span style={{
+                              padding: '2px 8px',
+                              borderRadius: '4px',
+                              fontSize: '0.75rem',
+                              fontWeight: 600,
+                              backgroundColor: log.action === 'ai_call' ? '#e0f2fe' : '#ecfdf5',
+                              color: log.action === 'ai_call' ? '#0369a1' : '#047857'
+                            }}>
+                              {log.action === 'ai_call' ? 'AI Call' : 'Cron Run'}
+                            </span>
+                          </td>
+                          <td style={{ fontSize: '0.85rem', color: '#475569' }}>
+                            {log.email}
+                          </td>
+                          <td style={{ fontSize: '0.8rem', color: '#334155' }}>
+                            {log.action === 'ai_call' ? (
+                              <div>
+                                <strong>Client:</strong> {log.details?.client_name} <br/>
+                                <strong>Model:</strong> {log.details?.model} ({log.details?.provider}) <br/>
+                                <strong>Count:</strong> Generated {log.details?.count} suggestions
+                              </div>
+                            ) : (
+                              <div>
+                                <strong>Type:</strong> {log.details?.type} <br/>
+                                <strong>Checked:</strong> {log.details?.clients_checked} AI profiles processed
+                              </div>
+                            )}
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
 
       {/* Footer */}

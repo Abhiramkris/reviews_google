@@ -205,22 +205,17 @@ export default function ClientDashboard() {
   };
 
   const copyFunnelLink = (clientId: string) => {
-    const params = new URLSearchParams(window.location.search);
-    const parentOrigin = params.get('parent_origin');
-    
-    const customDomain = import.meta.env.VITE_FEEDBACK_DOMAIN;
-    const baseDomain = parentOrigin 
-      ? parentOrigin.replace(/\/$/, '') 
-      : (customDomain ? customDomain.replace(/\/$/, '') : window.location.origin);
-    
-    let linkPath = '/feedback';
-    if (window.location.pathname.includes('/clientReview')) {
-      linkPath = '/clientReview/feedback';
-    } else if (window.location.pathname.includes('/reviewdash')) {
-      linkPath = '/reviewdash/feedback';
+    // Copy the short slug link if one exists
+    if (slugs && slugs.length > 0) {
+      const shortLink = `https://www.reviewmanager.in/s/${slugs[0]}`;
+      navigator.clipboard.writeText(shortLink).then(() => {
+        setCopiedLink(true);
+        setTimeout(() => setCopiedLink(false), 2000);
+      });
+      return;
     }
-    
-    const link = `${baseDomain}${linkPath}?clientId=${clientId}`;
+
+    const link = `https://www.reviewmanager.in/feedback?clientId=${clientId}`;
     navigator.clipboard.writeText(link).then(() => {
       setCopiedLink(true);
       setTimeout(() => setCopiedLink(false), 2000);
