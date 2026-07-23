@@ -113,8 +113,8 @@ export default function LandingPage() {
             <a href="#faq" style={{ fontSize: 14, fontWeight: 500, color: '#5f6368', textDecoration: 'none', transition: 'color 0.15s' }} onMouseEnter={e => e.currentTarget.style.color = BLUE} onMouseLeave={e => e.currentTarget.style.color = '#5f6368'}>FAQ</a>
             <a href="#blog" style={{ fontSize: 14, fontWeight: 500, color: '#5f6368', textDecoration: 'none', transition: 'color 0.15s' }} onMouseEnter={e => e.currentTarget.style.color = BLUE} onMouseLeave={e => e.currentTarget.style.color = '#5f6368'}>Blog</a>
             <a href="#" onClick={(e) => { e.preventDefault(); openModal('demo'); }} style={{ fontSize: 14, fontWeight: 500, color: '#5f6368', textDecoration: 'none', transition: 'color 0.15s' }} onMouseEnter={e => e.currentTarget.style.color = BLUE} onMouseLeave={e => e.currentTarget.style.color = '#5f6368'}>Contact</a>
-            <a href="#" style={{ fontSize: 14, fontWeight: 500, color: '#5f6368', textDecoration: 'none', transition: 'color 0.15s' }} onMouseEnter={e => e.currentTarget.style.color = BLUE} onMouseLeave={e => e.currentTarget.style.color = '#5f6368'}>Privacy Policy</a>
-            <a href="#" style={{ fontSize: 14, fontWeight: 500, color: '#5f6368', textDecoration: 'none', transition: 'color 0.15s' }} onMouseEnter={e => e.currentTarget.style.color = BLUE} onMouseLeave={e => e.currentTarget.style.color = '#5f6368'}>Terms</a>
+            <a href="/privacy" style={{ fontSize: 14, fontWeight: 500, color: '#5f6368', textDecoration: 'none', transition: 'color 0.15s' }} onMouseEnter={e => e.currentTarget.style.color = BLUE} onMouseLeave={e => e.currentTarget.style.color = '#5f6368'}>Privacy Policy</a>
+            <a href="/terms" style={{ fontSize: 14, fontWeight: 500, color: '#5f6368', textDecoration: 'none', transition: 'color 0.15s' }} onMouseEnter={e => e.currentTarget.style.color = BLUE} onMouseLeave={e => e.currentTarget.style.color = '#5f6368'}>Terms</a>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <Btn onClick={goToLogin}>Login</Btn>
@@ -610,7 +610,7 @@ export default function LandingPage() {
           </div>
           <div style={{ display: 'flex', gap: 24 }}>
             {['Privacy', 'Terms', 'Contact'].map(l => (
-              <a key={l} href="#" style={{ fontSize: 13, color: '#9aa0a6', textDecoration: 'none' }}
+              <a key={l} href={`/${l.toLowerCase()}`} style={{ fontSize: 13, color: '#9aa0a6', textDecoration: 'none' }}
                 onMouseEnter={e => e.currentTarget.style.color = '#5f6368'}
                 onMouseLeave={e => e.currentTarget.style.color = '#9aa0a6'}>{l}</a>
             ))}
